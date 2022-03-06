@@ -1,13 +1,12 @@
 import { Table, Button } from "antd";
 import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
 
-const CRUDTable = ({ data, technicalNameToFriendly, onEditRow, onDeleteRow }) => {
+const CRUDTable = ({ data, columnsToDisplay, onEditRow, onDeleteRow }) => {
 
-  const {_, ...singleRow}  = data[0]
+  const { _id, ...singleRow } = data[0];
   let columns = Object.keys(singleRow).map((column, k) => ({
-    title: column, //technicalNameToFriendly[column],
+    title: columnsToDisplay?.[column]?.label ?? column,
     dataIndex: column,
-    key: k,
     //width: 200,
   }));
 
@@ -17,9 +16,8 @@ const CRUDTable = ({ data, technicalNameToFriendly, onEditRow, onDeleteRow }) =>
     fixed: "right",
     width: 125,
     render: (_, record) => {
-      console.log(record)
       return (
-        <div>
+        <div key={record._id}>
           <Button onClick={() => onEditRow(record._id)}>
             <EditOutlined />
           </Button>
@@ -31,20 +29,8 @@ const CRUDTable = ({ data, technicalNameToFriendly, onEditRow, onDeleteRow }) =>
     },
   });
 
- 
-
   return (
-    <div>
-      <Button
-        type="primary"
-        style={{
-          marginBottom: 16,
-        }}
-      >
-        Add a row
-      </Button>
-      <Table columns={columns} dataSource={data} />
-    </div>
+      <Table columns={columns} dataSource={data} rowKey="_id"/>
   );
 };
 
