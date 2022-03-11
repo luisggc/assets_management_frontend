@@ -1,7 +1,10 @@
 import React from "react";
 import { Layout, Menu, Breadcrumb } from "antd";
 import { UserOutlined, LaptopOutlined, NotificationOutlined } from "@ant-design/icons";
-import ListPage from "./components/ListPage";
+/* import CompaniesListPage from "./pages/CompaniesListPage"; */
+import UnitsListPage from "./pages/UnitsListPage";
+import CompaniesListPage from "./pages/CompaniesListPage";
+import { Route, Routes, Link } from "react-router-dom";
 
 const { SubMenu } = Menu;
 const { Header, Content, Sider } = Layout;
@@ -23,12 +26,6 @@ const App = () => {
           className="site-layout-background"
           breakpoint="lg"
           collapsedWidth="0"
-          onBreakpoint={(broken) => {
-            console.log(broken);
-          }}
-          onCollapse={(collapsed, type) => {
-            console.log(collapsed, type);
-          }}
         >
           <Menu
             mode="inline"
@@ -36,11 +33,14 @@ const App = () => {
             defaultOpenKeys={["sub1"]}
             style={{ height: "100%", borderRight: 0 }}
           >
-            <SubMenu key="sub1" icon={<UserOutlined />} title="Companies">
-              <Menu.Item key="1">List</Menu.Item>
-              <Menu.Item key="2">Create</Menu.Item>
-              <Menu.Item key="3">option3</Menu.Item>
-              <Menu.Item key="4">option4</Menu.Item>
+            {/* <SubMenu icon={<LaptopOutlined />} title="Live Monitoring">
+              <Link to="/">Live</Link>
+            </SubMenu> */}
+            <SubMenu key="sub1" icon={<UserOutlined />} title="Tables">
+              <Menu.Item key="1"><Link to="companies">Companies</Link></Menu.Item>
+              <Menu.Item key="3"><Link to="units">Units</Link></Menu.Item>
+              <Menu.Item key="2"><Link to="users">Users</Link></Menu.Item>
+              <Menu.Item key="4"><Link to="assets">Assets</Link></Menu.Item>
             </SubMenu>
             <SubMenu key="sub2" icon={<LaptopOutlined />} title="Units">
               <Menu.Item key="5">option5</Menu.Item>
@@ -76,7 +76,11 @@ const App = () => {
               minHeight: 280,
             }}
           >
-            <ListPage />
+            <Routes>
+              <Route element = { (<p>Home</p>) }  path="/" exact/>
+              <Route element = { <CompaniesListPage /> }  path="companies" />
+              <Route element = { <UnitsListPage /> }  path="units" />
+            </Routes>
           </Content>
         </Layout>
       </Layout>

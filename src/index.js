@@ -6,6 +6,7 @@ import ptBR from "antd/lib/locale/pt_BR";
 import "antd/dist/antd.min.css";
 import "./index.css";
 import App from "./App";
+import { BrowserRouter } from "react-router-dom";
 
 // eslint-disable-next-line
 const consoleError = console.error.bind(console);
@@ -19,9 +20,11 @@ console.error = (errObj, ...args) => {
 
 ReactDOM.render(
   <React.StrictMode>
-    <ConfigProvider locale={ptBR}>
-      <App />
-    </ConfigProvider>
+    <BrowserRouter>
+      <ConfigProvider locale={ptBR}>
+        <App />
+      </ConfigProvider>
+    </BrowserRouter>
   </React.StrictMode>,
   document.getElementById("root")
 );

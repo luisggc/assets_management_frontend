@@ -1,12 +1,14 @@
-import { Modal, Input, Form, Button } from "antd";
-import { useState } from "react";
+import { Modal, Input, Form, Button, Select } from "antd";
+import { useState, useEffect } from "react";
 
 const AddEditModal = ({ isVisible, setModalIsVisible, fields, title, onSubmit, data }) => {
   const [confirmLoading, setConfirmLoading] = useState(false);
+  const [optionsValues, setOptionsValues] = useState([]);
+
   const onFinish = (values) => {
     setConfirmLoading(true);
-    console.log("onfinish", values)
-    console.log("data", data)
+    console.log("onfinish", values);
+    console.log("data", data);
     onSubmit({ _id: data?._id, ...values });
     setConfirmLoading(false);
     setModalIsVisible(false);
@@ -15,6 +17,25 @@ const AddEditModal = ({ isVisible, setModalIsVisible, fields, title, onSubmit, d
   const handleCancel = () => {
     setModalIsVisible(false);
   };
+
+  useEffect(() => {
+    let fieldsWithOptions = fields?.filter((field) => Object.keys(field).includes("getOptions"));
+    console.log(fieldsWithOptions);
+    if (fieldsWithOptions?.length === 0) return;
+    const getOptionsField = async (fieldsWithOptions) => {
+      const optionsAndValues = fieldsWithOptions.map(async (field) => {
+        return { value: field.value, options: await field.getOptions() };
+      });
+      return await Promise.all(optionsAndValues);
+    };
+    const promisseOptionsAndValues = getOptionsField(fieldsWithOptions);
+    console.log(promisseOptionsAndValues);
+    promisseOptionsAndValues.then((optionsAndValues) => {
+      setOptionsValues(optionsAndValues.reduce((a, v) => ({ ...a, [v.value]: v.options }), {}));
+    });
+  }, [fields]);
+
+  console.log(optionsValues);
 
   return (
     <Modal
@@ -26,8 +47,14 @@ const AddEditModal = ({ isVisible, setModalIsVisible, fields, title, onSubmit, d
           <Button key="cancel" onClick={handleCancel}>
             Cancel
           </Button>
-          <Button loading={confirmLoading} form="myForm" type="primary" htmlType="submit" key="submit">
-            {confirmLoading ? 'Sending' : 'Send'}
+          <Button
+            loading={confirmLoading}
+            form="myForm"
+            type="primary"
+            htmlType="submit"
+            key="submit"
+          >
+            {confirmLoading ? "Sending" : "Send"}
           </Button>
         </div>,
       ]}
@@ -48,21 +75,41 @@ const AddEditModal = ({ isVisible, setModalIsVisible, fields, title, onSubmit, d
         onFinish={onFinish}
         preserve={false}
       >
-        {Object.keys(fields).map((column, key) => {
-          const [db_name, label] = [column, fields[column].label];
+        {fields.map((field) => {
+          let { value, label, type } = field;
+          type = type ? type : "string";
+
           return (
             <Form.Item
-              key={key}
+              key={value}
               label={label}
-              name={db_name}
-              initialValue={data?.[db_name]}
+              name={value}
+              initialValue={data?.[value]}
               rules={[
                 {
                   required: true,
                 },
               ]}
             >
-              <Input />
+              {type === "options" ? (
+                <Select
+                  showSearch
+                  optionFilterProp="children"
+                  filterOption={(input, option) =>
+                    option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                  }
+                >
+                  {optionsValues[value]?.map((v) => (
+                    <Select.Option value={v.value} key={v.value}>
+                      {v.label}
+                    </Select.Option>
+                  ))}
+                </Select>
+              ) : type === "string" ? (
+                <Input />
+              ) : (
+                <></>
+              )}
             </Form.Item>
           );
         })}

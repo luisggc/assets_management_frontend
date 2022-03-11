@@ -3,10 +3,9 @@ import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
 
 const CRUDTable = ({ data, columnsToDisplay, onEditRow, onDeleteRow }) => {
 
-  const { _id, ...singleRow } = data[0];
-  let columns = Object.keys(singleRow).map((column, k) => ({
-    title: columnsToDisplay?.[column]?.label ?? column,
-    dataIndex: column,
+  let columns = columnsToDisplay.map((column, k) => ({
+    title: column.label,
+    dataIndex: column.value,
     //width: 200,
   }));
 
