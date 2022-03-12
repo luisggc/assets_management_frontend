@@ -3,13 +3,8 @@ import { useState } from "react";
 import { query } from "../../api/index.js";
 import { queryAddCompany, queryEditCompany } from "../../api/CompanyQueries";
 
-const AddEditModal = ({
-  isVisible,
-  setModalIsVisible,
-  initialInputData,
-  onAfterSubmit,
-  handleCancel,
-}) => {
+const AddEditModal = (props) => {
+  const { isVisible, setModalIsVisible, initialInputData, handleCancel } = props;
   const [confirmLoading, setConfirmLoading] = useState(false);
   const inputProps = {
     name: {
@@ -19,33 +14,28 @@ const AddEditModal = ({
     },
   };
 
-  const submitEdit = (data) => {
-    const requestData = async () => {
-      await query(queryEditCompany(data));
-      //Could set here error messagens if API fails
-    };
-    requestData();
+  var onAfterSubmit = () => {
+    props.onAfterSubmit();
+    setConfirmLoading(false);
+    setModalIsVisible(false);
   };
 
-  const submitAdd = (inputData) => {
+  const submitQuery = (myQuery, data) => {
     const requestData = async () => {
-      await query(queryAddCompany(inputData));
+      await query(myQuery(data));
       //Could set here error messagens if API fails
     };
-    requestData();
+    requestData().then(onAfterSubmit);
   };
 
   const onFinish = (values) => {
     setConfirmLoading(true);
     console.log("onfinish", values);
     if (initialInputData) {
-      submitEdit({ _id: initialInputData?._id, ...values });
+      submitQuery(queryEditCompany, { _id: initialInputData?._id, ...values })
     } else {
-      submitAdd(values);
+      submitQuery(queryAddCompany, values)
     }
-    onAfterSubmit();
-    setConfirmLoading(false);
-    setModalIsVisible(false);
   };
 
   return (

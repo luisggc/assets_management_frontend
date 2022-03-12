@@ -25,29 +25,21 @@ const AddEditModal = ({
     },
   });
 
-  const submitEdit = (data) => {
+  const submitQuery = (myQuery, data) => {
     const requestData = async () => {
-      await query(queryEditUnit(data));
+      await query(myQuery(data));
       //Could set here error messagens if API fails
     };
-    requestData();
-  };
-
-  const submitAdd = (inputData) => {
-    const requestData = async () => {
-      await query(queryAddUnit(inputData));
-      //Could set here error messagens if API fails
-    };
-    requestData();
+    requestData().then(onAfterSubmit);
   };
 
   const onFinish = (values) => {
     setConfirmLoading(true);
     console.log("onfinish", values);
     if (initialInputData) {
-      submitEdit({ _id: initialInputData?._id, ...values });
+      submitQuery(queryEditUnit, { _id: initialInputData?._id, ...values });
     } else {
-      submitAdd(values);
+      submitQuery(queryAddUnit, values);
     }
     onAfterSubmit();
     setConfirmLoading(false);

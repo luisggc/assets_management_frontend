@@ -18,10 +18,11 @@ export default function UnitsListPage() {
     const data = await query(queryGetUnits);
     const returnedData = data.units.map((unit) => ({
       ...unit,
-      company: unit.company.name,
-      company_id: unit.company._id,
+      company: unit?.company?.name,
+      company_id: unit?.company?._id,
     }));
     setItens(returnedData);
+    console.log(returnedData)
     //Could set here error messagens if API fails
     setIsLoading(false);
   }, []);

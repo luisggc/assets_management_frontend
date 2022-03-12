@@ -16,10 +16,9 @@ export default function CompanysListPage() {
     //Could improve performance to not read everything and make pagination load
     setIsLoading(true);
     const data = await query(queryGetCompanies);
-    const returnedData = data.companies
-    setItens(returnedData);
-    //Could set here error messagens if API fails
+    setItens(data.companies);
     setIsLoading(false);
+    //Could set here error messagens if API fails
   }, []);
 
   const columnsToDisplay = [
@@ -27,7 +26,7 @@ export default function CompanysListPage() {
       value: "name",
       label: "Name",
       type: "string",
-    }
+    },
   ];
 
   const deleteItem = async (_id) => {
@@ -44,6 +43,7 @@ export default function CompanysListPage() {
   };
 
   const onDeleteRow = (_id) => {
+    // Create a message saying It will affect units, etc
     deleteItem(_id).then(loadDataTable);
   };
 

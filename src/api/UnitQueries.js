@@ -28,7 +28,7 @@ export const queryAddUnit = (inputData) => `mutation {
       }`;
 
 export const queryEditUnit = (data) => `mutation {
-  editUnit(UnitInput: {_id: "${data._id}", name: "${data.name}", company: "${data.company_id}}){
+  editUnit(UnitInput: {_id: "${data._id}", name: "${data.name}", company: "${data.company}"}){
       name
   }
 }`;
