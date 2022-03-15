@@ -5,6 +5,8 @@ import { UserOutlined, LaptopOutlined, NotificationOutlined } from "@ant-design/
 import UnitsListPage from "./pages/UnitsListPage";
 import CompaniesListPage from "./pages/CompaniesListPage";
 import { Route, Routes, Link } from "react-router-dom";
+import UsersListPage from "./pages/UsersListPage";
+import AssetsListPage from "./pages/AssetsListPage";
 
 const { SubMenu } = Menu;
 const { Header, Content, Sider } = Layout;
@@ -80,6 +82,8 @@ const App = () => {
               <Route element = { (<p>Home</p>) }  path="/" exact/>
               <Route element = { <CompaniesListPage /> }  path="companies" />
               <Route element = { <UnitsListPage /> }  path="units" />
+              <Route element = { <UsersListPage /> }  path="users" />
+              <Route element = { <AssetsListPage /> }  path="assets" />
             </Routes>
           </Content>
         </Layout>
