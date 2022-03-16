@@ -7,16 +7,23 @@ import CompaniesListPage from "./pages/CompaniesListPage";
 import { Route, Routes, Link } from "react-router-dom";
 import UsersListPage from "./pages/UsersListPage";
 import AssetsListPage from "./pages/AssetsListPage";
+import { useLocation } from 'react-router-dom'
+import HomePage from "./pages/HomePage";
 
 const { SubMenu } = Menu;
 const { Header, Content, Sider } = Layout;
 
 const App = () => {
+
+
+  const pathname = useLocation().pathname
+  console.log(pathname)
+
   return (
     <Layout>
       <Header className="header">
         <div className="logo" />
-        <Menu theme="dark" mode="horizontal" defaultSelectedKeys={["2"]}>
+        <Menu theme="dark" mode="horizontal" >
         {/*   <Menu.Item key="1">nav 1</Menu.Item>
           <Menu.Item key="2">nav 2</Menu.Item>
           <Menu.Item key="3">nav 3</Menu.Item> */}
@@ -31,28 +38,28 @@ const App = () => {
         >
           <Menu
             mode="inline"
-            defaultSelectedKeys={["1"]}
             defaultOpenKeys={["sub1"]}
             style={{ height: "100%", borderRight: 0 }}
+            defaultSelectedKeys={[pathname]}
           >
-            {/* <SubMenu icon={<LaptopOutlined />} title="Live Monitoring">
+            <Menu.Item icon={<LaptopOutlined />} title="Live Monitoring" key="/">
               <Link to="/">Live</Link>
-            </SubMenu> */}
+            </Menu.Item>
             <SubMenu key="sub1" icon={<UserOutlined />} title="Tables">
-              <Menu.Item key="1"><Link to="companies">Companies</Link></Menu.Item>
-              <Menu.Item key="3"><Link to="units">Units</Link></Menu.Item>
-              <Menu.Item key="2"><Link to="users">Users</Link></Menu.Item>
-              <Menu.Item key="4"><Link to="assets">Assets</Link></Menu.Item>
+              <Menu.Item key="/companies"><Link to="/companies">Companies</Link></Menu.Item>
+              <Menu.Item key="/units"><Link to="/units">Units</Link></Menu.Item>
+              <Menu.Item key="/users"><Link to="/users">Users</Link></Menu.Item>
+              <Menu.Item key="/assets"><Link to="/assets">Assets</Link></Menu.Item>
             </SubMenu>
             <SubMenu key="sub2" icon={<LaptopOutlined />} title="Units">
-              <Menu.Item key="5">option5</Menu.Item>
-              <Menu.Item key="6">option6</Menu.Item>
-              <Menu.Item key="7">option7</Menu.Item>
-              <Menu.Item key="8">option8</Menu.Item>
+              <Menu.Item key="6">option5</Menu.Item>
+              <Menu.Item key="7">option6</Menu.Item>
+              <Menu.Item key="8">option7</Menu.Item>
+              <Menu.Item key="9">option8</Menu.Item>
             </SubMenu>
             <SubMenu key="sub3" icon={<NotificationOutlined />} title="Assets">
-              <Menu.Item key="9">option9</Menu.Item>
-              <Menu.Item key="10">option10</Menu.Item>
+              <Menu.Item key="10">option9</Menu.Item>
+              <Menu.Item key="111">option10</Menu.Item>
               <Menu.Item key="11">option11</Menu.Item>
               <Menu.Item key="12">option12</Menu.Item>
             </SubMenu>
@@ -79,7 +86,7 @@ const App = () => {
             }}
           >
             <Routes>
-              <Route element = { (<p>Home</p>) }  path="/" exact/>
+              <Route element = { <HomePage /> }  path="/" exact/>
               <Route element = { <CompaniesListPage /> }  path="companies" />
               <Route element = { <UnitsListPage /> }  path="units" />
               <Route element = { <UsersListPage /> }  path="users" />

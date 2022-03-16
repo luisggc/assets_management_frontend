@@ -1,4 +1,4 @@
-import { Modal, Input, Form, Button, Select } from "antd";
+import { Modal, Input, Form, Button, Select, InputNumber } from "antd";
 import { useState, useEffect } from "react";
 import { query } from "../../api/index.js";
 import { queryAddAsset, queryEditAsset } from "../../api/AssetQueries";
@@ -52,7 +52,7 @@ const AddEditModal = ({
 
   const submitQuery = (myQuery, data) => {
     const requestData = async () => {
-      await query(myQuery(data));
+      await query(myQuery({ ...data, health_level: data?.health_level / 100 }));
       //Could set here error messagens if API fails
     };
     requestData().then(onAfterSubmit);
@@ -107,7 +107,7 @@ const AddEditModal = ({
         </Form.Item>
 
         <Form.Item {...inputProps?.description} initialValue={initialInputData?.description}>
-          <Input.TextArea rows={4} />
+          <Input.TextArea rows={4} spellCheck />
         </Form.Item>
 
         <Form.Item {...inputProps?.model} initialValue={initialInputData?.model}>
@@ -122,8 +122,14 @@ const AddEditModal = ({
           </Select>
         </Form.Item>
 
-        <Form.Item {...inputProps?.health_level} initialValue={initialInputData?.health_level}>
-          <Input />
+        <Form.Item {...inputProps?.health_level}>
+          <InputNumber
+            defaultValue={Math.round(100 * initialInputData?.health_level)}
+            min={0}
+            max={100}
+            formatter={(value) => `${value}%`}
+            parser={(value) => value.replace("%", "")}
+          />
         </Form.Item>
 
         <Form.Item {...inputProps?.unit} initialValue={initialInputData?.unit_id}>

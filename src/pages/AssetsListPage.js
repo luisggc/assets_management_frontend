@@ -2,13 +2,13 @@ import React from "react";
 import { query } from "../api/index.js";
 import { queryGetAssets, queryDeleteAsset } from "../api/AssetQueries";
 import { useState, useEffect, useCallback } from "react";
-import { Button, Skeleton, Spin } from "antd";
-import CRUDTable from "../components/CRUDTable";
+import { Button, Spin, Card } from "antd";
+import CardAsset from "./AssetsListPage/CardAsset";
 import AssetAddEditModal from "../components/modals/AssetAddEditModal";
 
 export default function AssetsListPage() {
   const [isLoading, setIsLoading] = useState(true);
-  const [itens, setItens] = useState();
+  const [items, setItens] = useState();
   const [modalIsVisible, setModalIsVisible] = useState(false);
   const [dataToEdit, setDataToEdit] = useState();
 
@@ -27,37 +27,6 @@ export default function AssetsListPage() {
     setIsLoading(false);
   }, []);
 
-  const columnsToDisplay = [
-    {
-      value: "name",
-      label: "Name",
-    },
-    {
-      value: "image",
-      label: "Image",
-    },
-    {
-      value: "description",
-      label: "Description",
-    },
-    {
-      value: "model",
-      label: "Model",
-    },
-    {
-      value: "status",
-      label: "Status",
-    },
-    {
-      value: "health_level",
-      label: "Health Level",
-    },
-    {
-      value: "unit",
-      label: "Unit",
-    },
-  ];
-
   const deleteItem = async (_id) => {
     await query(queryDeleteAsset(_id));
   };
@@ -67,7 +36,7 @@ export default function AssetsListPage() {
   }, [loadDataTable]);
 
   const onEditRow = (_id) => {
-    setDataToEdit(itens.filter((d) => d?._id === _id)[0]);
+    setDataToEdit(items.filter((d) => d?._id === _id)[0]);
     setModalIsVisible(true);
   };
 
@@ -88,7 +57,7 @@ export default function AssetsListPage() {
           marginBottom: 16,
         }}
       >
-        Add a row
+        Add an Asset
       </Button>
 
       <AssetAddEditModal
@@ -100,20 +69,29 @@ export default function AssetsListPage() {
       />
       <div>
         {!isLoading ? (
-          itens?.length > 0 ? (
-            <CRUDTable
-              data={itens}
-              onEditRow={onEditRow}
-              onDeleteRow={onDeleteRow}
-              columnsToDisplay={columnsToDisplay}
-            />
+          items?.length > 0 ? (
+            <div className="cardsAssetContainer">
+              {items.map((item) => (
+                <CardAsset
+                  key={item._id}
+                  data={item}
+                  onEditRow={onEditRow}
+                  onDeleteRow={onDeleteRow}
+                  onAfterSubmit={loadDataTable}
+                />
+              ))}
+            </div>
           ) : (
             <p>No data</p>
           )
         ) : (
           <>
             <Spin />
-            <Skeleton />
+            <div className="cardsAssetContainer">
+            {Array.from(Array(13).keys()).map((key) => (
+              <Card key={key} style={{ width: 300 }} loading />
+            ))}
+            </div>
           </>
         )}
       </div>

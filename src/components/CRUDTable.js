@@ -1,8 +1,7 @@
-import { Table, Button } from "antd";
+import { Table, Button, Popconfirm } from "antd";
 import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
 
 const CRUDTable = ({ data, columnsToDisplay, onEditRow, onDeleteRow }) => {
-
   let columns = columnsToDisplay.map((column, k) => ({
     title: column.label,
     dataIndex: column.value,
@@ -20,17 +19,22 @@ const CRUDTable = ({ data, columnsToDisplay, onEditRow, onDeleteRow }) => {
           <Button onClick={() => onEditRow(record._id)}>
             <EditOutlined />
           </Button>
-          <Button onClick={() => onDeleteRow(record._id)}>
-            <DeleteOutlined />
-          </Button>
+          <Popconfirm
+            title="Are you sure to delete this item?"
+            onConfirm={() => onDeleteRow(record._id)}
+            okText="Yes"
+            cancelText="No"
+          >
+            <Button>
+              <DeleteOutlined />
+            </Button>
+          </Popconfirm>
         </div>
       );
     },
   });
 
-  return (
-      <Table columns={columns} dataSource={data} rowKey="_id"/>
-  );
+  return <Table columns={columns} dataSource={data} rowKey="_id" />;
 };
 
 export default CRUDTable;
