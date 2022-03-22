@@ -69,7 +69,7 @@ export default function UsersListPage() {
           marginBottom: 16,
         }}
       >
-        Add a row
+        Add a user
       </Button>
 
       <UserAddEditModal

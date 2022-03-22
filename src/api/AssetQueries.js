@@ -30,3 +30,47 @@ export const queryEditAsset = (inputData) => `mutation {
       _id
   }
 }`;
+
+export const queryGetAssetsLogs = `{
+  assetsLogs {
+    _id
+    type
+    datetime
+    asset{
+    name
+    }
+    responsible{
+      name
+    }
+    value
+    updatedAt
+    createdAt
+  }
+}`;
+
+export const queryGetAssetsLog = (asset_id) => `{
+  assetsLog(_id: "${asset_id}") {
+    _id
+    type
+    datetime
+    asset{
+    name
+    }
+    responsible{
+      name
+    }
+    value
+    updatedAt
+    createdAt
+  }
+}`;
+
+export const queryAddAssetLog = (inputData) => `mutation {
+    createAssetLog(AssetLogInput: {type: ${inputData.type}, datetime: "${inputData.datetime}", asset: "${inputData.asset}", responsible: "${inputData.responsible}", value: ${inputData.value}}){
+      _id
+    }
+}`;
+
+export const queryDeleteAssetLog = (_id) => `mutation {
+  deleteAssetLog(_id: "${_id}")
+}`;

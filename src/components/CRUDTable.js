@@ -16,19 +16,27 @@ const CRUDTable = ({ data, columnsToDisplay, onEditRow, onDeleteRow }) => {
     render: (_, record) => {
       return (
         <div key={record._id}>
-          <Button onClick={() => onEditRow(record._id)}>
-            <EditOutlined />
-          </Button>
-          <Popconfirm
-            title="Are you sure to delete this item?"
-            onConfirm={() => onDeleteRow(record._id)}
-            okText="Yes"
-            cancelText="No"
-          >
-            <Button>
-              <DeleteOutlined />
+          {onEditRow ? (
+            <Button onClick={() => onEditRow(record._id)}>
+              <EditOutlined />
             </Button>
-          </Popconfirm>
+          ) : (
+            <></>
+          )}
+          {onDeleteRow ? (
+            <Popconfirm
+              title="Are you sure to delete this item?"
+              onConfirm={() => onDeleteRow(record._id)}
+              okText="Yes"
+              cancelText="No"
+            >
+              <Button>
+                <DeleteOutlined />
+              </Button>
+            </Popconfirm>
+          ) : (
+            <></>
+          )}
         </div>
       );
     },

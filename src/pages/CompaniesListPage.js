@@ -60,7 +60,7 @@ export default function CompanysListPage() {
           marginBottom: 16,
         }}
       >
-        Add a row
+        Add a company
       </Button>
 
       <CompanyAddEditModal

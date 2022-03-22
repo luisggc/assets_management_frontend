@@ -1,0 +1,9 @@
+.two-columns {
+  grid-column: 2 span;
+}
+
+@media (max-width: 1060px) {
+  .two-columns {
+    grid-column: 1 span;
+  }
+}

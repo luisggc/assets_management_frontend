@@ -69,7 +69,7 @@ export default function UnitsListPage() {
           marginBottom: 16,
         }}
       >
-        Add a row
+        Add a unit
       </Button>
 
       <UnitAddEditModal

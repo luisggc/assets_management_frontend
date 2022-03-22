@@ -57,7 +57,7 @@ export default function AssetsListPage() {
           marginBottom: 16,
         }}
       >
-        Add an Asset
+        Add an asset
       </Button>
 
       <AssetAddEditModal
