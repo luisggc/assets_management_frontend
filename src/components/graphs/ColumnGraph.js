@@ -1,72 +1,45 @@
-import React from 'react'
 import { Column } from "@ant-design/plots";
+import { ASSETS_BY_UNIT } from "../../api/statisticQueries";
+import { useQuery } from "@apollo/client";
+import LoadingData from "../LoadingData";
 
 const ColumnGraph = () => {
-    const data = [
-      {
-        type: "家具家电",
-        sales: 38,
+  const { loading, error, data } = useQuery(ASSETS_BY_UNIT);
+  if (!data) return <LoadingData {...{ loading, error }} />;
+
+  const dataAsset = data?.assetsStatistics?.assetsByField;
+
+  const config = {
+    data: dataAsset,
+    autoFit: true,
+    xField: "field",
+    yField: "assets",
+    label: {
+      // 可手动配置 label 数据标签位置
+      position: "middle",
+      // 'top', 'bottom', 'middle',
+      // 配置样式
+      style: {
+        fill: "#FFFFFF",
+        opacity: 0.6,
       },
-      {
-        type: "粮油副食",
-        sales: 52,
-      },
-      {
-        type: "生鲜水果",
-        sales: 61,
-      },
-      {
-        type: "美容洗护",
-        sales: 145,
-      },
-      {
-        type: "母婴用品",
-        sales: 48,
-      },
-      {
-        type: "进口食品",
-        sales: 38,
-      },
-      {
-        type: "食品饮料",
-        sales: 38,
-      },
-      {
-        type: "家庭清洁",
-        sales: 38,
-      },
-    ];
-    const config = {
-      data,
-      autoFit: true,
-      xField: "type",
-      yField: "sales",
+    },
+    xAxis: {
       label: {
-        // 可手动配置 label 数据标签位置
-        position: "middle",
-        // 'top', 'bottom', 'middle',
-        // 配置样式
-        style: {
-          fill: "#FFFFFF",
-          opacity: 0.6,
-        },
+        autoHide: true,
+        autoRotate: false,
       },
-      xAxis: {
-        label: {
-          autoHide: true,
-          autoRotate: false,
-        },
+    },
+    meta: {
+      type: {
+        alias: "类别",
       },
-      meta: {
-        type: {
-          alias: "类别",
-        },
-        sales: {
-          alias: "销售额",
-        },
+      sales: {
+        alias: "销售额",
       },
-    };
-    return <Column {...config} />;
+    },
   };
-  
-  export default ColumnGraph
+  return <Column {...config} />;
+};
+
+export default ColumnGraph;

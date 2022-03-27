@@ -1,56 +1,59 @@
 import React from "react";
 import { Layout, Menu, Breadcrumb } from "antd";
-import { UserOutlined, LaptopOutlined, NotificationOutlined } from "@ant-design/icons";
-/* import CompaniesListPage from "./pages/CompaniesListPage"; */
+import {
+  FundProjectionScreenOutlined,
+  TableOutlined,
+} from "@ant-design/icons";
 import UnitsListPage from "./pages/UnitsListPage";
 import CompaniesListPage from "./pages/CompaniesListPage";
 import { Route, Routes, Link } from "react-router-dom";
 import UsersListPage from "./pages/UsersListPage";
 import AssetsListPage from "./pages/AssetsListPage";
-import { useLocation } from 'react-router-dom'
+import { useLocation } from "react-router-dom";
 import HomePage from "./pages/HomePage";
 
 const { SubMenu } = Menu;
 const { Header, Content, Sider } = Layout;
 
 const App = () => {
-
-
-  const pathname = useLocation().pathname
-  console.log(pathname)
+  const pathname = useLocation().pathname;
 
   return (
     <Layout>
       <Header className="header">
         <div className="logo" />
-        <Menu theme="dark" mode="horizontal" >
-        {/*   <Menu.Item key="1">nav 1</Menu.Item>
+        <Menu theme="dark" mode="horizontal">
+          {/*   <Menu.Item key="1">nav 1</Menu.Item>
           <Menu.Item key="2">nav 2</Menu.Item>
           <Menu.Item key="3">nav 3</Menu.Item> */}
         </Menu>
       </Header>
       <Layout>
-        <Sider
-          width={200}
-          className="site-layout-background"
-          breakpoint="lg"
-          collapsedWidth="0"
-        >
+        <Sider width={200} className="site-layout-background" breakpoint="lg" collapsedWidth="0">
           <Menu
             mode="inline"
             defaultOpenKeys={["sub1"]}
             style={{ height: "100%", borderRight: 0 }}
             defaultSelectedKeys={[pathname]}
           >
-            <Menu.Item icon={<LaptopOutlined />} title="Live Monitoring" key="/">
-              <Link to="/">Live</Link>
+            <Menu.Item icon={<FundProjectionScreenOutlined />} title="Statistics" key="/">
+              <Link to="/">Statistics</Link>
             </Menu.Item>
-            <SubMenu key="sub1" icon={<UserOutlined />} title="Tables">
-              <Menu.Item key="/companies"><Link to="/companies">Companies</Link></Menu.Item>
-              <Menu.Item key="/units"><Link to="/units">Units</Link></Menu.Item>
-              <Menu.Item key="/users"><Link to="/users">Users</Link></Menu.Item>
-              <Menu.Item key="/assets"><Link to="/assets">Assets</Link></Menu.Item>
+            <SubMenu key="sub1" icon={<TableOutlined />} title="Tables">
+              <Menu.Item key="/companies">
+                <Link to="/companies">Companies</Link>
+              </Menu.Item>
+              <Menu.Item key="/units">
+                <Link to="/units">Units</Link>
+              </Menu.Item>
+              <Menu.Item key="/users">
+                <Link to="/users">Users</Link>
+              </Menu.Item>
+              <Menu.Item key="/assets">
+                <Link to="/assets">Assets</Link>
+              </Menu.Item>
             </SubMenu>
+{/* 
             <SubMenu key="sub2" icon={<LaptopOutlined />} title="Units">
               <Menu.Item key="6">option5</Menu.Item>
               <Menu.Item key="7">option6</Menu.Item>
@@ -68,7 +71,8 @@ const App = () => {
               <Menu.Item key="14">option10</Menu.Item>
               <Menu.Item key="15">option11</Menu.Item>
               <Menu.Item key="16">option12</Menu.Item>
-            </SubMenu>
+            </SubMenu> */}
+
           </Menu>
         </Sider>
         <Layout style={{ padding: "0 24px 24px" }}>
@@ -86,11 +90,11 @@ const App = () => {
             }}
           >
             <Routes>
-              <Route element = { <HomePage /> }  path="/" exact/>
-              <Route element = { <CompaniesListPage /> }  path="companies" />
-              <Route element = { <UnitsListPage /> }  path="units" />
-              <Route element = { <UsersListPage /> }  path="users" />
-              <Route element = { <AssetsListPage /> }  path="assets" />
+              <Route element={<HomePage />} path="/" exact />
+              <Route element={<CompaniesListPage />} path="companies" />
+              <Route element={<UnitsListPage />} path="units" />
+              <Route element={<UsersListPage />} path="users" />
+              <Route element={<AssetsListPage />} path="assets" />
             </Routes>
           </Content>
         </Layout>

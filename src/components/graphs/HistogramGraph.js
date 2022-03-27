@@ -1,28 +1,20 @@
-import { useState, useEffect } from "react";
 import { Histogram } from "@ant-design/plots";
+import { ASSETS_BY_HEALTH_LEVEL } from "../../api/statisticQueries";
+import { useQuery } from "@apollo/client";
+import LoadingData from "../LoadingData";
 
 const HistogramGraph = () => {
-  const [data, setData] = useState([]);
+  const { loading, error, data } = useQuery(ASSETS_BY_HEALTH_LEVEL);
+  if (!data) return <LoadingData {...{ loading, error }} />;
+  const dataAsset = data?.assetsStatistics?.assetsByHealthLevel;
 
-  useEffect(() => {
-    asyncFetch();
-  }, []);
-
-  const asyncFetch = () => {
-    fetch("https://gw.alipayobjects.com/os/antfincdn/RoliHq%2453S/histogram.json")
-      .then((response) => response.json())
-      .then((json) => setData(json))
-      .catch((error) => {
-        console.log("fetch data failed", error);
-      });
-  };
   const config = {
-    data,
-    binField: "value",
-    binWidth: 2,
+    data: dataAsset,
+    binField: "health_level",
+    binWidth: 0.2,
   };
 
   return <Histogram {...config} />;
 };
 
-export default HistogramGraph
+export default HistogramGraph;

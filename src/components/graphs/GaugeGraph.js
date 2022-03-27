@@ -1,9 +1,17 @@
 import React from "react";
 import { Gauge } from "@ant-design/plots";
+import { AVERAGE_HEALTH_LEVEL_ASSET } from "../../api/statisticQueries";
+import { useQuery } from "@apollo/client";
+import LoadingData from "../LoadingData";
 
 const GaugeGraph = () => {
+  const { loading, error, data } = useQuery(AVERAGE_HEALTH_LEVEL_ASSET);
+  if (!data) return <LoadingData {...{ loading, error }} />;
+
+  const percent = data?.assetsStatistics?.averageHealthLevelAsset / 100;
+
   const config = {
-    percent: 0.75,
+    percent,
     range: {
       ticks: [0, 1 / 3, 2 / 3, 1],
       color: ["#F4664A", "#FAAD14", "#30BF78"],
@@ -32,4 +40,4 @@ const GaugeGraph = () => {
   return <Gauge {...config} height={300 - 23.7} />;
 };
 
-export default GaugeGraph
+export default GaugeGraph;

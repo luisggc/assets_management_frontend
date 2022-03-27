@@ -1,45 +1,18 @@
-import { Card, Statistic } from "antd";
+import { Card, Statistic, Spin, Skeleton } from "antd";
 import { ArrowDownOutlined } from "@ant-design/icons"; //ArrowUpOutlined
 import ColumnGraph from "../components/graphs/ColumnGraph";
 import GaugeGraph from "../components/graphs/GaugeGraph";
 import HistogramGraph from "../components/graphs/HistogramGraph";
 import LineGraph from "../components/graphs/LineGraph";
 import RoseGraph from "../components/graphs/RoseGraph";
-import DotMapGraph from "../components/graphs/DotMapGraph";
 import "./HomePage.css";
+import { useQuery } from "@apollo/client";
+import { TOP_CARD_HOME } from "../api/statisticQueries";
 
 export default function HomePage() {
   return (
     <>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 12 }}>
-        <Card style={styles.topCard}>
-          <Statistic
-            title="Average Status Assets"
-            value={11.28}
-            precision={2}
-            valueStyle={{ color: "#3f8600" }}
-            suffix="%"
-          />
-        </Card>
-        <Card style={styles.topCard}>
-          <Statistic title="Assets" prefix="#" value={115} />
-        </Card>
-        <Card style={styles.topCard}>
-          <Statistic title="Unit" value={3} prefix="#" />
-        </Card>
-
-        <Card style={styles.topCard}>
-          <Statistic
-            title="Idle"
-            value={9.4}
-            precision={2}
-            valueStyle={{ color: "#cf1322" }}
-            prefix={<ArrowDownOutlined />}
-            suffix="%"
-          />
-        </Card>
-      </div>
-
+      <TopCards />
       <div
         style={{
           display: "grid",
@@ -48,27 +21,74 @@ export default function HomePage() {
           marginTop: 12,
         }}
       >
-        <Card className="two-columns">
+        <Card title="Health Level along the Time" className="two-columns">
           <LineGraph />
         </Card>
-        <Card>
+        <Card title="Average Health Level">
           <GaugeGraph />
         </Card>
-        <Card>
+        <Card title="Assets by Status">
           <RoseGraph />
         </Card>
-        <Card>
+        <Card className="two-columns" title="Assets by Unit">
           <ColumnGraph />
         </Card>
-        <Card>
+        <Card className="two-columns" title="Distrbution of Assets per Status">
           <HistogramGraph />
         </Card>
-        <Card className="two-columns">
-          <DotMapGraph />
-        </Card>
+        {/* <Card className="two-columns"><DotMapGraph /> </Card>*/}
       </div>
     </>
   );
 }
 
+const TopCards = () => {
+  const { loading, data } = useQuery(TOP_CARD_HOME);
+
+  if (loading)
+    return (
+      <>
+        <Spin />
+        <Skeleton />
+      </>
+    );
+  /* if (error) return <p>{JSON.Stringify(error)}</p>; */
+
+  const { assets, companies, units } = data?.assetsStatistics;
+  const { name, health_level } = data?.assetsStatistics?.lowerHealthLevelAsset;
+
+  return (
+    <div style={{ display: "flex", flexWrap: "wrap", gap: 12 }}>
+      {/* <Card style={styles.topCard}>
+        <Statistic
+          title="Average Status Assets"
+          value={averageHealthLevelAsset}
+          precision={2}
+          valueStyle={{ color: "#3f8600" }}
+          suffix="%"
+        />
+      </Card> */}
+      <Card style={styles.topCard}>
+        <Statistic title="Assets" prefix="#" value={assets} />
+      </Card>
+      <Card style={styles.topCard}>
+        <Statistic title="Units" prefix="#" value={units} />
+      </Card>
+      <Card style={styles.topCard}>
+        <Statistic title="Companies" prefix="#" value={companies} />
+      </Card>
+
+      <Card style={styles.topCard}>
+        <Statistic
+          title={`Lowest Health Level Asset (${name})`}
+          value={health_level}
+          precision={2}
+          valueStyle={{ color: "#cf1322" }}
+          prefix={<ArrowDownOutlined />}
+          suffix="%"
+        />
+      </Card>
+    </div>
+  );
+};
 const styles = { topCard: { flexGrow: 1, flexBasis: 185 } };

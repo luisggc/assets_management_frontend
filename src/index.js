@@ -7,6 +7,19 @@ import "antd/dist/antd.min.css";
 import "./index.css";
 import App from "./App";
 import { BrowserRouter } from "react-router-dom";
+import { ApolloClient, InMemoryCache, ApolloProvider } from "@apollo/client";
+
+const client = new ApolloClient({
+  uri: "http://localhost:4000/graphql",
+
+  cache: new InMemoryCache({
+    typePolicies: {
+        AssetsStatistic: {
+          merge: true,
+        },
+      },
+  }),
+});
 
 // eslint-disable-next-line
 const consoleError = console.error.bind(console);
@@ -22,7 +35,9 @@ ReactDOM.render(
   <React.StrictMode>
     <BrowserRouter>
       <ConfigProvider locale={ptBR}>
-        <App />
+        <ApolloProvider client={client}>
+          <App />
+        </ApolloProvider>
       </ConfigProvider>
     </BrowserRouter>
   </React.StrictMode>,

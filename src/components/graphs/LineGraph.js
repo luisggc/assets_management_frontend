@@ -1,33 +1,26 @@
-import { useState, useEffect } from "react";
 import { Line } from "@ant-design/plots";
+import { ASSETS_HEALTH_LEVEL_HISTORY } from "../../api/statisticQueries";
+import { useQuery } from "@apollo/client";
+import LoadingData from "../LoadingData";
 
 const LineGraph = () => {
-    const [data, setData] = useState([]);
-  
-    useEffect(() => {
-      asyncFetch();
-    }, []);
-  
-    const asyncFetch = () => {
-      fetch("https://gw.alipayobjects.com/os/bmw-prod/1d565782-dde4-4bb6-8946-ea6a38ccf184.json")
-        .then((response) => response.json())
-        .then((json) => setData(json))
-        .catch((error) => {
-          console.log("fetch data failed", error);
-        });
-    };
-    const config = {
-      data,
-      padding: "auto",
-      xField: "Date",
-      yField: "scales",
-      xAxis: {
-        // type: 'timeCat',
-        tickCount: 5,
-      },
-    };
-  
-    return <Line {...config} />;
+  const { loading, error, data } = useQuery(ASSETS_HEALTH_LEVEL_HISTORY);
+  if (!data) return <LoadingData {...{ loading, error }} />;
+
+  const historyData = data?.assetsStatistics?.healthLevelHistory;
+
+  const config = {
+    data: historyData,
+    padding: "auto",
+    xField: "datetime",
+    yField: "health_level",
+    xAxis: {
+      // type: 'timeCat',
+      tickCount: 5,
+    },
   };
-  
-  export default LineGraph 
+
+  return <Line {...config} />;
+};
+
+export default LineGraph;

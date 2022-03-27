@@ -27,9 +27,7 @@ export default function AssetsListPage() {
     setIsLoading(false);
   }, []);
 
-  const deleteItem = async (_id) => {
-    await query(queryDeleteAsset(_id));
-  };
+  
 
   useEffect(() => {
     loadDataTable();
@@ -40,6 +38,10 @@ export default function AssetsListPage() {
     setModalIsVisible(true);
   };
 
+  const deleteItem = async (_id) => {
+    await query(queryDeleteAsset(_id));
+  };
+  
   const onDeleteRow = (_id) => {
     deleteItem(_id).then(loadDataTable);
   };
