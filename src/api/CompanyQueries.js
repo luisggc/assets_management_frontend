@@ -1,3 +1,5 @@
+import { gql } from "@apollo/client";
+
 export const queryGetCompanies = `{
     companies {
     name
@@ -5,18 +7,35 @@ export const queryGetCompanies = `{
     }
 }`;
 
-export const queryDeleteCompany = (_id) => `mutation {
-  deleteCompany(_id: "${_id}")
-}`;
-
-export const queryAddCompany = (inputData) => `mutation {
-  createCompany(name: "${inputData.name}") {
-    name
-    }
-}`;
-
-export const queryEditCompany = (data) => `mutation {
-  editCompany(CompanyInput: {_id: "${data._id}", name: "${data.name}"}){
+export const COMPANIES = gql`
+  query Companies {
+    companies {
       name
+      _id
+    }
   }
-}`;
+`;
+
+export const ADD_COMPANY = gql`
+  mutation CreateCompany($name: String!) {
+    createCompany(name: $name) {
+      _id
+      name
+    }
+  }
+`;
+
+export const DELETE_COMPANY = gql`
+  mutation DeleteCompany($_id: ID!) {
+    deleteCompany(_id: $_id)
+  }
+`;
+
+export const EDIT_COMPANY = gql`
+  mutation EditCompany($_id: ID!, $name: String!) {
+    editCompany(CompanyInput: { _id: $_id, name: $name }) {
+      _id
+      name
+    }
+  }
+`;

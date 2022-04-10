@@ -1,11 +1,21 @@
-import { Modal, Input, Form, Button } from "antd";
-import { useState } from "react";
-import { query } from "../../api/index.js";
-import { queryAddCompany, queryEditCompany } from "../../api/CompanyQueries";
+import { Modal, Input, Form, Button, notification } from "antd";
+import { ADD_COMPANY, EDIT_COMPANY, COMPANIES } from "../../api/CompanyQueries";
+import { useMutation } from "@apollo/client";
+import openNotification from "../openNotification";
 
 const AddEditModal = (props) => {
-  const { isVisible, setModalIsVisible, initialInputData, handleCancel } = props;
-  const [confirmLoading, setConfirmLoading] = useState(false);
+  const { isVisible, initialInputData, handleCancel } = props;
+  const isEdit = initialInputData !== undefined; // else is add
+  const [addCompany, addCompanyResponse] = useMutation(ADD_COMPANY, {
+    onCompleted: () => openNotification("Company added!", "success"),
+    onError: (error) => openNotification("Company not added!: " + error, "error"),
+  });
+  const [editCompany, editCompanyResponse] = useMutation(EDIT_COMPANY, {
+    onCompleted: () => openNotification("Company edited!", "success"),
+    onError: () => openNotification("Company not edited!", "error"),
+  });
+
+  const loading = isEdit ? editCompanyResponse?.loading : addCompanyResponse?.loading;
   const inputProps = {
     name: {
       label: "Name",
@@ -13,28 +23,28 @@ const AddEditModal = (props) => {
       rules: [{ required: true }],
     },
   };
-
   var onAfterSubmit = () => {
-    props.onAfterSubmit();
-    setConfirmLoading(false);
-    setModalIsVisible(false);
+    //props.onAfterSubmit();
+    handleCancel();
   };
 
-  const submitQuery = (myQuery, data) => {
-    const requestData = async () => {
-      await query(myQuery(data));
-      //Could set here error messagens if API fails
-    };
-    requestData().then(onAfterSubmit);
-  };
-
-  const onFinish = (values) => {
-    setConfirmLoading(true);
-    console.log("onfinish", values);
-    if (initialInputData) {
-      submitQuery(queryEditCompany, { _id: initialInputData?._id, ...values })
+  const onFormSend = (values) => {
+    if (isEdit) {
+      const variables = { variables: { _id: initialInputData?._id, ...values } };
+      editCompany(variables).then((_) => onAfterSubmit());
     } else {
-      submitQuery(queryAddCompany, values)
+      addCompany({
+        variables: values,
+        update: (cache, { data: { createCompany } }) => {
+          const data = cache.readQuery({ query: COMPANIES });
+          console.log(data);
+          console.log({ ...data, companies: [createCompany, ...data.companies] });
+          cache.writeQuery(
+            { query: COMPANIES },
+            { ...data, companies: [createCompany, ...data.companies] }
+          );
+        },
+      }).then((_) => onAfterSubmit());
     }
   };
 
@@ -42,12 +52,12 @@ const AddEditModal = (props) => {
     <Modal
       title={"Add modal"}
       visible={isVisible}
-      confirmLoading={confirmLoading}
-      footer={<Footer handleCancel={handleCancel} confirmLoading={confirmLoading} />}
+      loading={loading}
+      footer={<Footer handleCancel={handleCancel} loading={loading} />}
       onCancel={handleCancel}
       destroyOnClose
     >
-      <Form {...formProps} onFinish={onFinish}>
+      <Form {...formProps} onFinish={onFormSend}>
         <Form.Item {...inputProps?.name} initialValue={initialInputData?.name}>
           <Input />
         </Form.Item>
@@ -56,13 +66,13 @@ const AddEditModal = (props) => {
   );
 };
 
-const Footer = ({ handleCancel, confirmLoading }) => (
+const Footer = ({ handleCancel, loading }) => (
   <div>
     <Button key="cancel" onClick={handleCancel}>
       Cancel
     </Button>
-    <Button loading={confirmLoading} form="myForm" type="primary" htmlType="submit">
-      {confirmLoading ? "Sending" : "Send"}
+    <Button loading={loading} form="myForm" type="primary" htmlType="submit">
+      {loading ? "Sending" : "Send"}
     </Button>
   </div>
 );

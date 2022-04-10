@@ -1,8 +1,11 @@
 import React from "react";
 import { Layout, Menu, Breadcrumb } from "antd";
 import {
-  FundProjectionScreenOutlined,
-  TableOutlined,
+  DashboardOutlined,
+  BankOutlined,
+  ApartmentOutlined,
+  IdcardOutlined,
+  TagOutlined,
 } from "@ant-design/icons";
 import UnitsListPage from "./pages/UnitsListPage";
 import CompaniesListPage from "./pages/CompaniesListPage";
@@ -12,7 +15,7 @@ import AssetsListPage from "./pages/AssetsListPage";
 import { useLocation } from "react-router-dom";
 import HomePage from "./pages/HomePage";
 
-const { SubMenu } = Menu;
+//const { SubMenu } = Menu;
 const { Header, Content, Sider } = Layout;
 
 const App = () => {
@@ -36,43 +39,29 @@ const App = () => {
             style={{ height: "100%", borderRight: 0 }}
             defaultSelectedKeys={[pathname]}
           >
-            <Menu.Item icon={<FundProjectionScreenOutlined />} title="Statistics" key="/">
+            <Menu.Item icon={<DashboardOutlined />} key="/">
               <Link to="/">Statistics</Link>
             </Menu.Item>
-            <SubMenu key="sub1" icon={<TableOutlined />} title="Tables">
-              <Menu.Item key="/companies">
-                <Link to="/companies">Companies</Link>
-              </Menu.Item>
-              <Menu.Item key="/units">
-                <Link to="/units">Units</Link>
-              </Menu.Item>
-              <Menu.Item key="/users">
-                <Link to="/users">Users</Link>
-              </Menu.Item>
-              <Menu.Item key="/assets">
-                <Link to="/assets">Assets</Link>
-              </Menu.Item>
-            </SubMenu>
-{/* 
+            <Menu.Item icon={<TagOutlined />} key="/assets">
+              <Link to="/assets">Assets</Link>
+            </Menu.Item>
+            <Menu.Item icon={<BankOutlined />} key="/companies">
+              <Link to="/companies">Companies</Link>
+            </Menu.Item>
+            <Menu.Item icon={<ApartmentOutlined />} key="/units">
+              <Link to="/units">Units</Link>
+            </Menu.Item>
+            <Menu.Item icon={<IdcardOutlined />} key="/users">
+              <Link to="/users">Users</Link>
+            </Menu.Item>
+            
+            {/* 
             <SubMenu key="sub2" icon={<LaptopOutlined />} title="Units">
               <Menu.Item key="6">option5</Menu.Item>
               <Menu.Item key="7">option6</Menu.Item>
               <Menu.Item key="8">option7</Menu.Item>
               <Menu.Item key="9">option8</Menu.Item>
-            </SubMenu>
-            <SubMenu key="sub3" icon={<NotificationOutlined />} title="Assets">
-              <Menu.Item key="10">option9</Menu.Item>
-              <Menu.Item key="111">option10</Menu.Item>
-              <Menu.Item key="11">option11</Menu.Item>
-              <Menu.Item key="12">option12</Menu.Item>
-            </SubMenu>
-            <SubMenu key="sub4" icon={<NotificationOutlined />} title="People">
-              <Menu.Item key="13">option9</Menu.Item>
-              <Menu.Item key="14">option10</Menu.Item>
-              <Menu.Item key="15">option11</Menu.Item>
-              <Menu.Item key="16">option12</Menu.Item>
             </SubMenu> */}
-
           </Menu>
         </Sider>
         <Layout style={{ padding: "0 24px 24px" }}>

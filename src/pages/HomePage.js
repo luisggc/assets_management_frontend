@@ -1,13 +1,15 @@
-import { Card, Statistic, Spin, Skeleton } from "antd";
+import "./HomePage.css";
+import { Card, Statistic } from "antd";
+import { useQuery } from "@apollo/client";
+import { TOP_CARD_HOME } from "../api/statisticQueries";
 import { ArrowDownOutlined } from "@ant-design/icons"; //ArrowUpOutlined
+import LoadingData from "../components/LoadingData";
+
 import ColumnGraph from "../components/graphs/ColumnGraph";
 import GaugeGraph from "../components/graphs/GaugeGraph";
 import HistogramGraph from "../components/graphs/HistogramGraph";
 import LineGraph from "../components/graphs/LineGraph";
 import RoseGraph from "../components/graphs/RoseGraph";
-import "./HomePage.css";
-import { useQuery } from "@apollo/client";
-import { TOP_CARD_HOME } from "../api/statisticQueries";
 
 export default function HomePage() {
   return (
@@ -43,31 +45,14 @@ export default function HomePage() {
 }
 
 const TopCards = () => {
-  const { loading, data } = useQuery(TOP_CARD_HOME);
-
-  if (loading)
-    return (
-      <>
-        <Spin />
-        <Skeleton />
-      </>
-    );
-  /* if (error) return <p>{JSON.Stringify(error)}</p>; */
+  const { loading, data, error } = useQuery(TOP_CARD_HOME);
+  if (!data) return <LoadingData {...{ loading, error }} />;
 
   const { assets, companies, units } = data?.assetsStatistics;
   const { name, health_level } = data?.assetsStatistics?.lowerHealthLevelAsset;
 
   return (
     <div style={{ display: "flex", flexWrap: "wrap", gap: 12 }}>
-      {/* <Card style={styles.topCard}>
-        <Statistic
-          title="Average Status Assets"
-          value={averageHealthLevelAsset}
-          precision={2}
-          valueStyle={{ color: "#3f8600" }}
-          suffix="%"
-        />
-      </Card> */}
       <Card style={styles.topCard}>
         <Statistic title="Assets" prefix="#" value={assets} />
       </Card>

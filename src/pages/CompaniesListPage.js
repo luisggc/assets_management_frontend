@@ -1,25 +1,30 @@
 import React from "react";
-import { query } from "../api/index.js";
-import { queryGetCompanies, queryDeleteCompany } from "../api/CompanyQueries";
-import { useState, useEffect, useCallback } from "react";
-import { Button, Skeleton, Spin } from "antd";
+import { DELETE_COMPANY, COMPANIES } from "../api/CompanyQueries";
+import { useState } from "react";
+import { Button} from "antd";
 import CRUDTable from "../components/CRUDTable";
 import CompanyAddEditModal from "../components/modals/CompanyAddEditModal";
+import { useQuery, useMutation } from "@apollo/client";
+import LoadingData from "../components/LoadingData";
 
 export default function CompanysListPage() {
-  const [isLoading, setIsLoading] = useState(true);
-  const [itens, setItens] = useState();
+  const { loading, error, data, refetch } = useQuery(COMPANIES);
+  const [deleteCompany, deleteCompanyResponse] = useMutation(DELETE_COMPANY);
+
   const [modalIsVisible, setModalIsVisible] = useState(false);
   const [dataToEdit, setDataToEdit] = useState();
 
-  const loadDataTable = useCallback(async () => {
-    //Could improve performance to not read everything and make pagination load
-    setIsLoading(true);
-    const data = await query(queryGetCompanies);
-    setItens(data.companies);
-    setIsLoading(false);
-    //Could set here error messagens if API fails
-  }, []);
+  if (!data) return <LoadingData {...{ loading, error }} />;
+  /* if (deleteCompanyResponse.loading | deleteCompanyResponse.error)
+    return (
+      <LoadingData loading={deleteCompanyResponse.loading} error={deleteCompanyResponse.error} />
+    ); */
+
+  const itens = data?.companies;
+
+  const loadDataTable = () => {
+    //refetch();
+  };
 
   const columnsToDisplay = [
     {
@@ -30,12 +35,8 @@ export default function CompanysListPage() {
   ];
 
   const deleteItem = async (_id) => {
-    await query(queryDeleteCompany(_id));
+    deleteCompany({ variables: {_id} });
   };
-
-  useEffect(() => {
-    loadDataTable();
-  }, [loadDataTable]);
 
   const onEditRow = (_id) => {
     setDataToEdit(itens.filter((d) => d?._id === _id)[0]);
@@ -71,22 +72,15 @@ export default function CompanysListPage() {
         onAfterSubmit={loadDataTable}
       />
       <div>
-        {!isLoading ? (
-          itens?.length > 0 ? (
-            <CRUDTable
-              data={itens}
-              onEditRow={onEditRow}
-              onDeleteRow={onDeleteRow}
-              columnsToDisplay={columnsToDisplay}
-            />
-          ) : (
-            <p>No data</p>
-          )
+        {itens?.length > 0 ? (
+          <CRUDTable
+            data={itens}
+            onEditRow={onEditRow}
+            onDeleteRow={onDeleteRow}
+            columnsToDisplay={columnsToDisplay}
+          />
         ) : (
-          <>
-            <Spin />
-            <Skeleton />
-          </>
+          <p>No data</p>
         )}
       </div>
     </>

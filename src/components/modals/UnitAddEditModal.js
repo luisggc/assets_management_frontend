@@ -1,18 +1,30 @@
-import { Modal, Input, Form, Button, Select } from "antd";
-import { useState, useEffect } from "react";
-import { query } from "../../api/index.js";
-import { queryAddUnit, queryEditUnit } from "../../api/UnitQueries";
-import { queryGetCompanies } from "../../api/CompanyQueries";
+import { Modal, Input, Form, Button, Select, notification } from "antd";
+import { UNITS, ADD_UNIT, EDIT_UNIT } from "../../api/UnitQueries";
+import { COMPANIES } from "../../api/CompanyQueries";
+import { useMutation, useQuery } from "@apollo/client";
+import openNotification from "../openNotification";
 
-const AddEditModal = ({
-  isVisible,
-  setModalIsVisible,
-  initialInputData,
-  onAfterSubmit,
-  handleCancel,
-}) => {
-  const [confirmLoading, setConfirmLoading] = useState(false);
-  const [inputProps, setInputProps] = useState({
+const AddEditModal = (props) => {
+  let { isVisible, initialInputData, handleCancel } = props;
+  const isEdit = initialInputData !== undefined; // else is add
+  const [addUnit, addUnitResponse] = useMutation(ADD_UNIT, {
+    onCompleted: () => openNotification("Unit added!", "success"),
+    onError: (error) => openNotification("Unit not added!: " + error, "error"),
+  });
+  const [editUnit, editUnitResponse] = useMutation(EDIT_UNIT, {
+    onCompleted: () => openNotification("Unit edited!", "success"),
+    onError: () => openNotification("Unit not edited!", "error"),
+  });
+  const companiesQuery = useQuery(COMPANIES);
+  const [loadingCompanies, errorCompanies, dataCompanies] = [
+    companiesQuery.loading,
+    companiesQuery.error,
+    companiesQuery.data,
+  ];
+
+  const loading = isEdit ? editUnitResponse?.loading : addUnitResponse?.loading;
+
+  const inputProps = {
     name: {
       label: "Name",
       name: "name",
@@ -22,57 +34,51 @@ const AddEditModal = ({
       label: "Company",
       name: "company",
       rules: [{ required: true }],
+      initialValue: dataCompanies?.companies,
     },
-  });
-
-  const submitQuery = (myQuery, data) => {
-    const requestData = async () => {
-      await query(myQuery(data));
-      //Could set here error messagens if API fails
-    };
-    requestData().then(onAfterSubmit);
   };
 
-  const onFinish = (values) => {
-    setConfirmLoading(true);
-    console.log("onfinish", values);
-    if (initialInputData) {
-      submitQuery(queryEditUnit, { _id: initialInputData?._id, ...values });
+  var onAfterSubmit = () => {
+    //props.onAfterSubmit();
+    handleCancel();
+  };
+
+  const onFormSend = (values) => {
+    if (isEdit) {
+      editUnit({
+        variables: { _id: initialInputData?._id, ...values },
+      }).then((_) => onAfterSubmit());
     } else {
-      submitQuery(queryAddUnit, values);
-    }
-    onAfterSubmit();
-    setConfirmLoading(false);
-    setModalIsVisible(false);
-  };
-
-  useEffect(() => {
-    const getOptionsField = async () => {
-      const companies = await query(queryGetCompanies);
-      return { company: companies };
-    };
-    const optionsValuesPromise = getOptionsField();
-    optionsValuesPromise.then((optionsValues) => {
-      setInputProps((state) => ({
-        ...state,
-        company: {
-          ...state.company,
-          initialValue: optionsValues.company.companies,
+      addUnit({
+        variables: values,
+        update: (cache, { data: { createUnit } }) => {
+          console.log(createUnit);
+          const data = cache.readQuery({ query: UNITS });
+          console.log(data);
+          console.log({
+            units: [createUnit, ...data.units],
+          });
+          cache.writeQuery(
+            { query: UNITS },
+            {
+              units: [createUnit, ...data.units],
+            }
+          );
         },
-      }));
-    });
-  }, []);
+      }).then((_) => onAfterSubmit());
+    }
+  };
 
   return (
     <Modal
       title={"Add modal"}
       visible={isVisible}
-      confirmLoading={confirmLoading}
-      footer={<Footer handleCancel={handleCancel} confirmLoading={confirmLoading} />}
+      loading={loading}
+      footer={<Footer handleCancel={handleCancel} loading={loading} />}
       onCancel={handleCancel}
       destroyOnClose
     >
-      <Form {...formProps} onFinish={onFinish}>
+      <Form {...formProps} onFinish={onFormSend}>
         <Form.Item {...inputProps?.name} initialValue={initialInputData?.name}>
           <Input />
         </Form.Item>

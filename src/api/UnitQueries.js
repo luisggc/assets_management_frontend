@@ -1,3 +1,24 @@
+import { gql } from "@apollo/client";
+
+export const UNITS = gql`
+  query Units {
+    units {
+      _id
+      name
+      company {
+        _id
+        name
+      }
+    }
+  }
+`;
+
+export const DELETE_UNIT = gql`
+  mutation DeleteUnit($_id: ID!) {
+    deleteUnit(_id: $_id)
+  }
+`;
+
 export const queryGetUnits = `{
     units {
     _id
@@ -9,26 +30,28 @@ export const queryGetUnits = `{
     }
 }`;
 
-/*   handleData: (data) => {
-      return data.map((d) => ({
-        ...d,
-        company_name: d.company.name,
-      }));
-    },
-  }; */
-
-export const queryDeleteUnit = (_id) => `mutation {
-  deleteUnit(_id: "${_id}")
-}`;
-
-export const queryAddUnit = (inputData) => `mutation {
-        createUnit(name: "${inputData.name}", company: "${inputData.company}") {
-          name
-          }
-      }`;
-
-export const queryEditUnit = (data) => `mutation {
-  editUnit(UnitInput: {_id: "${data._id}", name: "${data.name}", company: "${data.company}"}){
+export const ADD_UNIT = gql`
+  mutation CreateUnit($name: String!, $company: ID!) {
+    createUnit(name: $name, company: $company) {
+      _id
       name
+      company {
+        _id
+        name
+      }
+    }
   }
-}`;
+`;
+
+export const EDIT_UNIT = gql`
+  mutation EditUnit($_id: ID!, $name: String, $company: ID) {
+    editUnit(UnitInput: { _id: $_id, name: $name, company: $company }) {
+      _id
+      name
+      company {
+        _id
+        name
+      }
+    }
+  }
+`;

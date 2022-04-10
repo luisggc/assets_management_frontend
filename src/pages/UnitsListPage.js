@@ -1,31 +1,31 @@
 import React from "react";
-import { query } from "../api/index.js";
-import { queryGetUnits, queryDeleteUnit } from "../api/UnitQueries";
-import { useState, useEffect, useCallback } from "react";
-import { Button, Skeleton, Spin } from "antd";
+import { UNITS, DELETE_UNIT } from "../api/UnitQueries";
+import { useState } from "react";
+import { Button } from "antd";
 import CRUDTable from "../components/CRUDTable";
 import UnitAddEditModal from "../components/modals/UnitAddEditModal";
+import { useQuery, useMutation } from "@apollo/client";
+import LoadingData from "../components/LoadingData";
 
 export default function UnitsListPage() {
-  const [isLoading, setIsLoading] = useState(true);
-  const [itens, setItens] = useState();
+  const { loading, error, data, refetch } = useQuery(UNITS);
+  const [deleteUnit, deleteUnitResponse] = useMutation(DELETE_UNIT);
+
   const [modalIsVisible, setModalIsVisible] = useState(false);
   const [dataToEdit, setDataToEdit] = useState();
 
-  const loadDataTable = useCallback(async () => {
-    //Could improve performance to not read everything and make pagination load
-    setIsLoading(true);
-    const data = await query(queryGetUnits);
-    const returnedData = data.units.map((unit) => ({
-      ...unit,
-      company: unit?.company?.name,
-      company_id: unit?.company?._id,
-    }));
-    setItens(returnedData);
-    console.log(returnedData)
-    //Could set here error messagens if API fails
-    setIsLoading(false);
-  }, []);
+  console.log(dataToEdit);
+  if (!data) return <LoadingData {...{ loading, error }} />;
+
+  const itens = data?.units?.map((unit) => ({
+    ...unit,
+    company: unit?.company?.name,
+    company_id: unit?.company?._id,
+  }));
+
+  const loadDataTable = () => {
+    refetch();
+  };
 
   const columnsToDisplay = [
     {
@@ -40,12 +40,8 @@ export default function UnitsListPage() {
   ];
 
   const deleteItem = async (_id) => {
-    await query(queryDeleteUnit(_id));
+    deleteUnit({ variables: { _id } });
   };
-
-  useEffect(() => {
-    loadDataTable();
-  }, [loadDataTable]);
 
   const onEditRow = (_id) => {
     setDataToEdit(itens.filter((d) => d?._id === _id)[0]);
@@ -53,6 +49,7 @@ export default function UnitsListPage() {
   };
 
   const onDeleteRow = (_id) => {
+    console.log(_id);
     deleteItem(_id).then(loadDataTable);
   };
 
@@ -60,6 +57,7 @@ export default function UnitsListPage() {
     setModalIsVisible(false);
     setDataToEdit();
   };
+
   return (
     <>
       <Button
@@ -80,22 +78,15 @@ export default function UnitsListPage() {
         onAfterSubmit={loadDataTable}
       />
       <div>
-        {!isLoading ? (
-          itens?.length > 0 ? (
-            <CRUDTable
-              data={itens}
-              onEditRow={onEditRow}
-              onDeleteRow={onDeleteRow}
-              columnsToDisplay={columnsToDisplay}
-            />
-          ) : (
-            <p>No data</p>
-          )
+        {itens?.length > 0 ? (
+          <CRUDTable
+            data={itens}
+            onEditRow={onEditRow}
+            onDeleteRow={onDeleteRow}
+            columnsToDisplay={columnsToDisplay}
+          />
         ) : (
-          <>
-            <Spin />
-            <Skeleton />
-          </>
+          <p>No data</p>
         )}
       </div>
     </>
