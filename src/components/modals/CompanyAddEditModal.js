@@ -1,4 +1,4 @@
-import { Modal, Input, Form, Button, notification } from "antd";
+import { Modal, Input, Form, Button } from "antd";
 import { ADD_COMPANY, EDIT_COMPANY, COMPANIES } from "../../api/CompanyQueries";
 import { useMutation } from "@apollo/client";
 import openNotification from "../openNotification";
@@ -37,12 +37,10 @@ const AddEditModal = (props) => {
         variables: values,
         update: (cache, { data: { createCompany } }) => {
           const data = cache.readQuery({ query: COMPANIES });
-          console.log(data);
-          console.log({ ...data, companies: [createCompany, ...data.companies] });
-          cache.writeQuery(
-            { query: COMPANIES },
-            { ...data, companies: [createCompany, ...data.companies] }
-          );
+          cache.writeQuery({
+            query: COMPANIES,
+            data: { ...data, companies: [createCompany, ...data.companies] },
+          });
         },
       }).then((_) => onAfterSubmit());
     }

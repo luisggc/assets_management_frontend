@@ -72,5 +72,7 @@ export const queryAddAssetLog = (inputData) => `mutation {
 }`;
 
 export const queryDeleteAssetLog = (_id) => `mutation {
-  deleteAssetLog(_id: "${_id}")
+  deleteAssetLog(_id: "${_id}"){
+    _id
+  }
 }`;

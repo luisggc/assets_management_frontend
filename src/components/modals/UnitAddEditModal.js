@@ -1,4 +1,4 @@
-import { Modal, Input, Form, Button, Select, notification } from "antd";
+import { Modal, Input, Form, Button, Select } from "antd";
 import { UNITS, ADD_UNIT, EDIT_UNIT } from "../../api/UnitQueries";
 import { COMPANIES } from "../../api/CompanyQueries";
 import { useMutation, useQuery } from "@apollo/client";
@@ -51,19 +51,15 @@ const AddEditModal = (props) => {
     } else {
       addUnit({
         variables: values,
-        update: (cache, { data: { createUnit } }) => {
-          console.log(createUnit);
-          const data = cache.readQuery({ query: UNITS });
-          console.log(data);
-          console.log({
-            units: [createUnit, ...data.units],
+        update: (cache, { data }) => {
+          const createdUnit = data?.createUnit;
+          const unitsData = cache.readQuery({ query: UNITS });
+          cache.writeQuery({
+            query: UNITS,
+            data: {
+              units: [createdUnit, ...unitsData.units],
+            },
           });
-          cache.writeQuery(
-            { query: UNITS },
-            {
-              units: [createUnit, ...data.units],
-            }
-          );
         },
       }).then((_) => onAfterSubmit());
     }

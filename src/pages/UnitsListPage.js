@@ -14,7 +14,6 @@ export default function UnitsListPage() {
   const [modalIsVisible, setModalIsVisible] = useState(false);
   const [dataToEdit, setDataToEdit] = useState();
 
-  console.log(dataToEdit);
   if (!data) return <LoadingData {...{ loading, error }} />;
 
   const itens = data?.units?.map((unit) => ({
@@ -39,8 +38,19 @@ export default function UnitsListPage() {
     },
   ];
 
-  const deleteItem = async (_id) => {
-    deleteUnit({ variables: { _id } });
+  const onDeleteRow = async (_id) => {
+    deleteUnit({
+      variables: { _id },
+      update: (cache, { data: { deleteUnit } }) => {
+        console.log(deleteUnit)
+        const data = cache.readQuery({ query: UNITS });
+        const unitsUpdated = data.units.filter((_) => _._id !== deleteUnit?._id)
+        cache.writeQuery({
+          query: UNITS,
+          data: { units: unitsUpdated },
+        });
+      },
+    });
   };
 
   const onEditRow = (_id) => {
@@ -48,10 +58,6 @@ export default function UnitsListPage() {
     setModalIsVisible(true);
   };
 
-  const onDeleteRow = (_id) => {
-    console.log(_id);
-    deleteItem(_id).then(loadDataTable);
-  };
 
   const handleModalCancel = () => {
     setModalIsVisible(false);
@@ -75,7 +81,6 @@ export default function UnitsListPage() {
         setModalIsVisible={setModalIsVisible}
         initialInputData={dataToEdit}
         handleCancel={handleModalCancel}
-        onAfterSubmit={loadDataTable}
       />
       <div>
         {itens?.length > 0 ? (

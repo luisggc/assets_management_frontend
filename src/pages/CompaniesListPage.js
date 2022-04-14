@@ -1,7 +1,7 @@
 import React from "react";
 import { DELETE_COMPANY, COMPANIES } from "../api/CompanyQueries";
 import { useState } from "react";
-import { Button} from "antd";
+import { Button } from "antd";
 import CRUDTable from "../components/CRUDTable";
 import CompanyAddEditModal from "../components/modals/CompanyAddEditModal";
 import { useQuery, useMutation } from "@apollo/client";
@@ -35,7 +35,19 @@ export default function CompanysListPage() {
   ];
 
   const deleteItem = async (_id) => {
-    deleteCompany({ variables: {_id} });
+    deleteCompany({
+      variables: { _id },
+      update: (cache, { data: { deleteCompany } }) => {
+        console.log(deleteCompany)
+        const data = cache.readQuery({ query: COMPANIES });
+        console.log(data.companies)
+        console.log(data.companies.filter((_) => _._id !== deleteCompany?._id))
+        cache.writeQuery({
+          query: COMPANIES,
+          data: { ...data, companies: data.companies.filter((_) => _._id !== deleteCompany?._id) },
+        });
+      },
+    });
   };
 
   const onEditRow = (_id) => {

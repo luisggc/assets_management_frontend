@@ -15,7 +15,9 @@ export const UNITS = gql`
 
 export const DELETE_UNIT = gql`
   mutation DeleteUnit($_id: ID!) {
-    deleteUnit(_id: $_id)
+    deleteUnit(_id: $_id) {
+      _id
+    }
   }
 `;
 

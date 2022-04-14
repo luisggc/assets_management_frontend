@@ -27,7 +27,9 @@ export const ADD_COMPANY = gql`
 
 export const DELETE_COMPANY = gql`
   mutation DeleteCompany($_id: ID!) {
-    deleteCompany(_id: $_id)
+    deleteCompany(_id: $_id) {
+      _id
+    }
   }
 `;
 

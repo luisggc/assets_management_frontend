@@ -18,7 +18,9 @@ export const queryGetUsers = `{
   }; */
 
 export const queryDeleteUser = (_id) => `mutation {
-  deleteUser(_id: "${_id}")
+  deleteUser(_id: "${_id}") {
+    _id
+  }
 }`;
 
 export const queryAddUser = (inputData) => `mutation {
