@@ -1,4 +1,3 @@
-import React from "react";
 import { DELETE_COMPANY, COMPANIES } from "../api/CompanyQueries";
 import { useState } from "react";
 import { Button } from "antd";
@@ -6,25 +5,22 @@ import CRUDTable from "../components/CRUDTable";
 import CompanyAddEditModal from "../components/modals/CompanyAddEditModal";
 import { useQuery, useMutation } from "@apollo/client";
 import LoadingData from "../components/LoadingData";
+import openNotification from "../components/openNotification";
 
 export default function CompanysListPage() {
-  const { loading, error, data, refetch } = useQuery(COMPANIES);
-  const [deleteCompany, deleteCompanyResponse] = useMutation(DELETE_COMPANY);
+  const { loading, error, data } = useQuery(COMPANIES);
+  const [deleteCompany, deleteCompanyResponse] = useMutation(DELETE_COMPANY, {
+    onCompleted: () => openNotification("Company removed!", "success"),
+    onError: () => openNotification("Company not removed!", "error"),
+  });
 
   const [modalIsVisible, setModalIsVisible] = useState(false);
   const [dataToEdit, setDataToEdit] = useState();
 
-  if (!data) return <LoadingData {...{ loading, error }} />;
-  /* if (deleteCompanyResponse.loading | deleteCompanyResponse.error)
-    return (
-      <LoadingData loading={deleteCompanyResponse.loading} error={deleteCompanyResponse.error} />
-    ); */
+  if (!data)
+    return <LoadingData {...{ loading: loading | deleteCompanyResponse?.loading, error }} />;
 
   const itens = data?.companies;
-
-  const loadDataTable = () => {
-    //refetch();
-  };
 
   const columnsToDisplay = [
     {
@@ -38,10 +34,10 @@ export default function CompanysListPage() {
     deleteCompany({
       variables: { _id },
       update: (cache, { data: { deleteCompany } }) => {
-        console.log(deleteCompany)
+        //console.log(deleteCompany);
         const data = cache.readQuery({ query: COMPANIES });
-        console.log(data.companies)
-        console.log(data.companies.filter((_) => _._id !== deleteCompany?._id))
+        //console.log(data.companies);
+        //console.log(data.companies.filter((_) => _._id !== deleteCompany?._id));
         cache.writeQuery({
           query: COMPANIES,
           data: { ...data, companies: data.companies.filter((_) => _._id !== deleteCompany?._id) },
@@ -57,7 +53,7 @@ export default function CompanysListPage() {
 
   const onDeleteRow = (_id) => {
     // Create a message saying It will affect units, etc
-    deleteItem(_id).then(loadDataTable);
+    deleteItem(_id);
   };
 
   const handleModalCancel = () => {
@@ -81,7 +77,6 @@ export default function CompanysListPage() {
         setModalIsVisible={setModalIsVisible}
         initialInputData={dataToEdit}
         handleCancel={handleModalCancel}
-        onAfterSubmit={loadDataTable}
       />
       <div>
         {itens?.length > 0 ? (

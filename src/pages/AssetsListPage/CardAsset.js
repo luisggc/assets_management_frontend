@@ -11,23 +11,36 @@ import {
   CloseCircleOutlined,
   EllipsisOutlined,
 } from "@ant-design/icons";
-import { queryAddAsset } from "../../api/AssetQueries";
-import { query } from "../../api/index.js";
+import { ADD_ASSET, ASSETS } from "../../api/AssetQueries";
 import AssetsLog from "./AssetsLog";
+import { useMutation } from "@apollo/client";
+import openNotification from "../../components/openNotification";
 
 const { Meta } = Card;
 const { Paragraph } = Typography;
 
-export default function CardAsset({ data, onEditRow, onDeleteRow, onAfterSubmit }) {
+export default function CardAsset({ data, onEditRow, onDeleteRow }) {
   const [assetLogVisible, setAssetLogVisible] = useState(false);
 
-  const submitQuery = (myQuery, data) => {
-    const requestData = async () => {
-      await query(myQuery(data));
-      //Could set here error messagens if API fails
-    };
-    requestData().then(onAfterSubmit);
-  };
+  const addAsset = useMutation(ADD_ASSET, {
+    onCompleted: () => openNotification("Asset duplicated!", "success"),
+    onError: (error) => openNotification("Asset not duplicated!: " + error, "error"),
+  })[0];
+
+  const duplicateAsset = (values) => {
+    addAsset({
+      variables: values,
+      update: (cache, { data }) => {
+        const createAsset = data?.createAsset;
+        const initialData = cache.readQuery({ query: ASSETS });
+        cache.writeQuery({
+          query: ASSETS,
+          data: { ...initialData, assets: [createAsset, ...initialData.assets] },
+        });
+      },
+    })
+  }
+
   const health_level = Math.round(100 * data?.health_level);
   let healthLevelComponentProps = (health_level) => {
     if (health_level >= 80) return { icon: <CheckCircleOutlined />, color: "success" };
@@ -84,7 +97,7 @@ export default function CardAsset({ data, onEditRow, onDeleteRow, onAfterSubmit 
                   <Popconfirm
                     key="copy"
                     title="Are you sure to duplicate this item?"
-                    onConfirm={() => submitQuery(queryAddAsset, { ...data, unit: data?.unit_id })}
+                    onConfirm={() => duplicateAsset({ ...data, unit: data?.unit_id })}
                     okText="Yes"
                     cancelText="No"
                   >

@@ -1,18 +1,25 @@
 import { Modal, Input, Form, Button, Select, InputNumber } from "antd";
-import { useState, useEffect } from "react";
-import { query } from "../../api/index.js";
-import { queryAddAsset, queryEditAsset } from "../../api/AssetQueries";
-import { queryGetUnits } from "../../api/UnitQueries";
+import { ADD_ASSET, EDIT_ASSET, ASSETS } from "../../api/AssetQueries";
+import { UNITS } from "../../api/UnitQueries";
+import { useMutation, useQuery } from "@apollo/client";
+import openNotification from "../openNotification";
 
-const AddEditModal = ({
-  isVisible,
-  setModalIsVisible,
-  initialInputData,
-  onAfterSubmit,
-  handleCancel,
-}) => {
-  const [confirmLoading, setConfirmLoading] = useState(false);
-  const [inputProps, setInputProps] = useState({
+const AddEditModal = (props) => {
+  const { isVisible, initialInputData, handleCancel } = props;
+  const isEdit = initialInputData !== undefined; // else is add
+  const [addAsset, addAssetResponse] = useMutation(ADD_ASSET, {
+    onCompleted: () => openNotification("Asset added!", "success"),
+    onError: (error) => openNotification("Asset not added!: " + error, "error"),
+  });
+  const [editAsset, editAssetResponse] = useMutation(EDIT_ASSET, {
+    onCompleted: () => openNotification("Asset edited!", "success"),
+    onError: () => openNotification("Asset not edited!", "error"),
+  });
+  const unitResponse = useQuery(UNITS);
+  const loading =
+    (isEdit ? addAssetResponse?.loading : editAssetResponse?.loading) && unitResponse.loading;
+
+  const inputProps = {
     name: {
       label: "Name",
       name: "name",
@@ -47,57 +54,57 @@ const AddEditModal = ({
       label: "Unit",
       name: "unit",
       rules: [{ required: true }],
+      initialValue: unitResponse?.data?.units,
     },
-  });
-
-  const submitQuery = (myQuery, data) => {
-    const requestData = async () => {
-      await query(myQuery({ ...data, health_level: data?.health_level / 100 }));
-      //Could set here error messagens if API fails
-    };
-    requestData().then(onAfterSubmit);
+    owner: {
+      label: "Owner",
+      name: "owner",
+      rules: [{ required: true }],
+    },
   };
 
-  const onFinish = (values) => {
-    setConfirmLoading(true);
-    console.log("onfinish", values);
-    if (initialInputData) {
-      submitQuery(queryEditAsset, { _id: initialInputData?._id, ...values });
-    } else {
-      submitQuery(queryAddAsset, values);
-    }
-    onAfterSubmit();
-    setConfirmLoading(false);
-    setModalIsVisible(false);
+  const onAfterSubmit = () => {
+    handleCancel();
   };
 
-  useEffect(() => {
-    const getOptionsField = async () => {
-      const units = await query(queryGetUnits);
-      return { unit: units };
+  const onFormSend = (initialValues) => {
+    const values = {
+      ...initialValues,
+      health_level: initialValues?.health_level / 100,
     };
-    const optionsValuesPromise = getOptionsField();
-    optionsValuesPromise.then((optionsValues) => {
-      setInputProps((state) => ({
-        ...state,
-        unit: {
-          ...state.unit,
-          initialValue: optionsValues.unit.units,
+    if (isEdit) {
+      const variables = {
+        variables: {
+          ...values,
+          _id: initialInputData?._id,
         },
-      }));
-    });
-  }, []);
+      };
+      editAsset(variables).then((_) => onAfterSubmit());
+    } else {
+      addAsset({
+        variables: values,
+        update: (cache, { data }) => {
+          const createAsset = data?.createAsset;
+          const initialData = cache.readQuery({ query: ASSETS });
+          cache.writeQuery({
+            query: ASSETS,
+            data: { ...initialData, assets: [createAsset, ...initialData.assets] },
+          });
+        },
+      }).then((_) => onAfterSubmit());
+    }
+  };
 
   return (
     <Modal
       title={"Add modal"}
       visible={isVisible}
-      confirmLoading={confirmLoading}
-      footer={<Footer handleCancel={handleCancel} confirmLoading={confirmLoading} />}
+      loading={loading}
+      footer={<Footer handleCancel={handleCancel} loading={loading} />}
       onCancel={handleCancel}
       destroyOnClose
     >
-      <Form {...formProps} onFinish={onFinish}>
+      <Form {...formProps} onFinish={onFormSend}>
         <Form.Item {...inputProps?.name} initialValue={initialInputData?.name}>
           <Input />
         </Form.Item>
@@ -122,9 +129,8 @@ const AddEditModal = ({
           </Select>
         </Form.Item>
 
-        <Form.Item {...inputProps?.health_level}>
+        <Form.Item {...inputProps?.health_level} initialValue={Math.round(100 * initialInputData?.health_level)}>
           <InputNumber
-            defaultValue={Math.round(100 * initialInputData?.health_level)}
             min={0}
             max={100}
             formatter={(value) => `${value}%`}
@@ -140,6 +146,10 @@ const AddEditModal = ({
               </Select.Option>
             ))}
           </Select>
+        </Form.Item>
+
+        <Form.Item {...inputProps?.owner} initialValue={initialInputData?.owner}>
+          <Input />
         </Form.Item>
       </Form>
     </Modal>

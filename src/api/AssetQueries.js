@@ -19,8 +19,17 @@ export const ASSETS = gql`
   }
 `;
 
-export const queryGetAssets = `{
-  assets {
+export const DELETE_ASSET = gql`
+  mutation DeleteAsset($_id: ID!) {
+    deleteAsset(_id: $_id) {
+      _id
+    }
+  }
+`;
+
+export const ADD_ASSET = gql`
+mutation CreateAsset($name: String!, $image: String!, $description: String!, $model: String!, $owner: String!, $status,: statusAsset! $health_level: Float!, $unit: String!) {
+  createAsset(AssetInput:{name: $name, image: $image, description: $description, model: $model, owner: $owner, status: $status, health_level: $health_level, unit: $unit}) {
     _id
     name
     image
@@ -34,59 +43,27 @@ export const queryGetAssets = `{
       name
     }
   }
-}`;
-
-
-export const DELETE_ASSET = gql`
-  mutation DeleteAsset($_id: ID!) {
-    deleteAsset(_id: $_id) {
-      _id
-    }
-  }
+}
 `;
-
-export const queryDeleteAsset = (_id) => `mutation {
-  deleteAsset(_id: "${_id}")
-}`;
-
-export const ADD_ASSET = gql`
-  mutation CreateAsset($name: String!, $image: String!, $description: String!, $model: String!, $owner: String!, $status,: String! $health_level: String!, $unit: String!) {
-      createAsset(AssetInput:{name: $name, image: $image, description: $description, model: $model, owner: $owner, status: $status, health_level: $health_level, unit: $unit}) {
-        _id
-      }
-  }
-`;
-
-export const queryAddAsset = (inputData) => `mutation {
-        createAsset(AssetInput:{name: "${inputData.name}", image: "${inputData.image}", description: "${inputData.description}", model: "${inputData.model}", owner: "${inputData.owner}", status: ${inputData.status}, health_level: ${inputData.health_level}, unit: "${inputData.unit}"}) {
-          _id
-          }
-      }`;
 
 export const EDIT_ASSET = gql`
-  mutation EditAsset($_id: ID!, $name: String!, $image: String!, $description: String!, $model: String!, $owner: String!, $status,: String! $health_level: String!, $unit: String!) {
-    editAsset(_id: $_id, AssetInput:{name: $name, image: $image, description: $description, model: $model, owner: $owner, status: $status, health_level: $health_level, unit: $unit}) {
+mutation EditAsset($_id: ID!, $name: String!, $image: String!, $description: String!, $model: String!, $owner: String!, $status: statusAsset!, $health_level: Float!, $unit: String!) {
+  editAsset(_id: $_id, AssetInput:{name: $name, image: $image, description: $description, model: $model, owner: $owner, status: $status, health_level: $health_level, unit: $unit}) {
+      _id
+      name
+      image
+      description
+      model
+      owner
+      status
+      health_level
+      unit {
         _id
         name
-        image
-        description
-        model
-        owner
-        status
-        health_level
-        unit {
-          _id
-          name
-        }
       }
-  }
+    }
+}
 `;
-
-export const queryEditAsset = (inputData) => `mutation {
-  editAsset(_id: "${inputData._id}", AssetInput: {name: "${inputData.name}", image: "${inputData.image}", description: "${inputData.description}", model: "${inputData.model}", owner: "${inputData.owner}", status: ${inputData.status}, health_level: ${inputData.health_level}, unit: "${inputData.unit}"}) {
-      _id
-  }
-}`;
 
 export const ASSETS_LOGS = gql`
   query AssetsLogs {

@@ -24,7 +24,6 @@ const AddEditModal = (props) => {
     },
   };
   var onAfterSubmit = () => {
-    //props.onAfterSubmit();
     handleCancel();
   };
 
