@@ -1,12 +1,5 @@
 import { gql } from "@apollo/client";
 
-export const queryGetCompanies = `{
-    companies {
-    name
-    _id
-    }
-}`;
-
 export const COMPANIES = gql`
   query Companies {
     companies {

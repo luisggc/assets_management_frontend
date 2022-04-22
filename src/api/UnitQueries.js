@@ -21,17 +21,6 @@ export const DELETE_UNIT = gql`
   }
 `;
 
-export const queryGetUnits = `{
-    units {
-    _id
-    name
-    company {
-        _id
-        name
-    }
-    }
-}`;
-
 export const ADD_UNIT = gql`
   mutation CreateUnit($name: String!, $company: ID!) {
     createUnit(name: $name, company: $company) {
