@@ -51,7 +51,7 @@ export default function CardAsset({ data, onEditRow, onDeleteRow }) {
 
   return (
     <>
-      <AssetsLog visible={assetLogVisible} setVisible={setAssetLogVisible} assetId={data?._id} />
+      {assetLogVisible ? <AssetsLog visible={assetLogVisible} setVisible={setAssetLogVisible} assetId={data?._id} /> : <></>}
       <Card
         style={{ width: 300 }}
         cover={

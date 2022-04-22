@@ -1,18 +1,26 @@
 import { Modal, Input, Form, Button, Select } from "antd";
-import { useState, useEffect } from "react";
-import { query } from "../../api/index.js";
-import { queryAddUser, queryEditUser } from "../../api/UserQueries";
-import { queryGetCompanies } from "../../api/CompanyQueries";
+import { USERS, ADD_USER, EDIT_USER } from "../../api/UserQueries";
+import { useMutation, useQuery } from "@apollo/client";
+import { COMPANIES } from "../../api/CompanyQueries";
+import openNotification from "../openNotification";
 
-const AddEditModal = ({
-  isVisible,
-  setModalIsVisible,
-  initialInputData,
-  onAfterSubmit,
-  handleCancel,
-}) => {
-  const [confirmLoading, setConfirmLoading] = useState(false);
-  const [inputProps, setInputProps] = useState({
+const AddEditModal = (props) => {
+  const { isVisible, initialInputData, handleCancel } = props;
+  const isEdit = initialInputData !== undefined; // else is add
+  const [addUser, addUserResponse] = useMutation(ADD_USER, {
+    onCompleted: () => openNotification("User added!", "success"),
+    onError: (error) => openNotification("User not added!: " + error, "error"),
+  });
+  const [editUser, editUserResponse] = useMutation(EDIT_USER, {
+    onCompleted: () => openNotification("User edited!", "success"),
+    onError: () => openNotification("User not edited!", "error"),
+  });
+  const companyResponse = useQuery(COMPANIES, { skip: !isVisible });
+  const loading =
+    (isEdit ? addUserResponse?.loading : editUserResponse?.loading) | companyResponse.loading;
+
+  console.log(companyResponse?.data);
+  const inputProps = {
     name: {
       label: "Name",
       name: "name",
@@ -22,57 +30,44 @@ const AddEditModal = ({
       label: "Company",
       name: "company",
       rules: [{ required: true }],
+      initialValue: companyResponse?.data?.companies,
     },
-  });
-
-  const submitQuery = (myQuery, data) => {
-    const requestData = async () => {
-      await query(myQuery(data));
-      //Could set here error messagens if API fails
-    };
-    requestData().then(onAfterSubmit);
   };
 
-  const onFinish = (values) => {
-    setConfirmLoading(true);
-    console.log("onfinish", values);
-    if (initialInputData) {
-      submitQuery(queryEditUser, { _id: initialInputData?._id, ...values });
-    } else {
-      submitQuery(queryAddUser, values);
-    }
-    onAfterSubmit();
-    setConfirmLoading(false);
-    setModalIsVisible(false);
-  };
-
-  useEffect(() => {
-    const getOptionsField = async () => {
-      const companies = await query(queryGetCompanies);
-      return { company: companies };
-    };
-    const optionsValuesPromise = getOptionsField();
-    optionsValuesPromise.then((optionsValues) => {
-      setInputProps((state) => ({
-        ...state,
-        company: {
-          ...state.company,
-          initialValue: optionsValues.company.companies,
+  const onFormSend = (values) => {
+    if (isEdit) {
+      const variables = {
+        variables: {
+          ...values,
+          _id: initialInputData?._id,
         },
-      }));
-    });
-  }, []);
+      };
+      editUser(variables)
+    } else {
+      addUser({
+        variables: values,
+        update: (cache, { data }) => {
+          const createUser = data?.createUser;
+          const initialData = cache.readQuery({ query: USERS });
+          cache.writeQuery({
+            query: USERS,
+            data: { ...initialData, users: [createUser, ...initialData.users] },
+          });
+        },
+      })
+    }
+  };
 
   return (
     <Modal
       title={"Add modal"}
       visible={isVisible}
-      confirmLoading={confirmLoading}
-      footer={<Footer handleCancel={handleCancel} confirmLoading={confirmLoading} />}
+      loading={loading}
+      footer={<Footer handleCancel={handleCancel} loading={loading} />}
       onCancel={handleCancel}
       destroyOnClose
     >
-      <Form {...formProps} onFinish={onFinish}>
+      <Form {...formProps} onFinish={onFormSend}>
         <Form.Item {...inputProps?.name} initialValue={initialInputData?.name}>
           <Input />
         </Form.Item>

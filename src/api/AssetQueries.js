@@ -140,22 +140,22 @@ export const queryGetAssetsLog = (asset_id) => `{
 }`;
 
 export const ADD_ASSET_LOG = gql`
-  mutation CreateAssetLog($type: String!, $datetime: String!, $asset: ID!, $responsible: String!, $value: Float!) {
-    createAssetLog(AssetLogInput:{type: $type, datetime: $datetime, asset: $asset, responsible: $responsible, value: $value}) {
-        _id
-        type
-        datetime
-        asset{
-        name
-        }
-        responsible{
-          name
-        }
-        value
-        updatedAt
-        createdAt
-      }
+mutation CreateAssetLog($type: typeAssetLog!, $datetime: Date!, $asset: ID!, $responsible: String!, $value: Float!) {
+  createAssetLog(AssetLogInput: {type: $type, datetime: $datetime, asset: $asset, responsible: $responsible, value: $value}) {
+    _id
+    type
+    datetime
+    asset {
+      name
+    }
+    responsible {
+      name
+    }
+    value
+    updatedAt
+    createdAt
   }
+}
 `;
 
 export const queryAddAssetLog = (inputData) => `mutation {

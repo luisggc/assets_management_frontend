@@ -15,7 +15,7 @@ const AddEditModal = (props) => {
     onCompleted: () => openNotification("Unit edited!", "success"),
     onError: () => openNotification("Unit not edited!", "error"),
   });
-  const companiesQuery = useQuery(COMPANIES);
+  const companiesQuery = useQuery(COMPANIES, { skip: !isVisible });
   const [loadingCompanies, errorCompanies, dataCompanies] = [
     companiesQuery.loading,
     companiesQuery.error,

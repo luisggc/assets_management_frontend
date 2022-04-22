@@ -15,7 +15,7 @@ const AddEditModal = (props) => {
     onCompleted: () => openNotification("Asset edited!", "success"),
     onError: () => openNotification("Asset not edited!", "error"),
   });
-  const unitResponse = useQuery(UNITS);
+  const unitResponse = useQuery(UNITS, { skip: !isVisible });
   const loading =
     (isEdit ? addAssetResponse?.loading : editAssetResponse?.loading) && unitResponse.loading;
 

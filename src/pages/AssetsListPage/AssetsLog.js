@@ -1,37 +1,46 @@
 import { Button, Drawer } from "antd";
-import { useCallback, useEffect, useState } from "react";
-import { query } from "../../api/index.js";
-import { queryGetAssetsLog, queryAddAssetLog, queryDeleteAssetLog } from "../../api/AssetQueries";
+import { ASSETS_LOG, ADD_ASSET_LOG, DELETE_ASSET_LOG } from "../../api/AssetQueries";
+import { useQuery, useMutation } from "@apollo/client";
+
 import CRUDTable from "../../components/CRUDTable.js";
+import openNotification from "../../components/openNotification";
+import LoadingData from "../../components/LoadingData";
 
 const AssetsLog = ({ visible, setVisible, assetId }) => {
-  const [logs, setLogs] = useState();
+  const { loading, error, data, refetch } = useQuery(ASSETS_LOG, {
+    variables: { _id: assetId },
+    skip: !visible,
+  });
+  console.log(loading)
 
-  const getQuery = useCallback((myQuery, data) => {
-    const requestData = async () => {
-      let logs = await query(myQuery(data));
-      logs = logs?.assetsLog?.map((log) => ({
-        ...log,
-        asset_name: log?.asset?.name,
-        responsible_name: log?.responsible?.name,
-        datetime: new Date(log?.datetime).toLocaleString("pt-BR"),
-        value: Math.round(100 * log?.value, 0) + "%",
-      }));
-      console.log(logs[0].datetime);
-      setLogs(logs);
-    };
-    requestData();
-  }, []);
+  const [addAssetLog, addAssetLogResponse] = useMutation(ADD_ASSET_LOG, {
+    onCompleted: () => {
+      openNotification("Asset log added!", "success");
+      refetch();
+    },
+    onError: (error) => openNotification("Asset log not added!: " + error, "error"),
+  });
 
-  useEffect(() => {
-    if (visible) {
-      getQuery(queryGetAssetsLog, assetId);
-    }
-  }, [visible, getQuery, assetId]);
+  const [deleteAssetLog, deleteAssetLogResponse] = useMutation(DELETE_ASSET_LOG, {
+    onCompleted: () => {
+      openNotification("Asset log deleted!", "success");
+      refetch();
+    },
+    onError: (error) => openNotification("Asset log not deleted!: " + error, "error"),
+  });
+
+  const logs = data?.assetsLog?.map((log) => ({
+    ...log,
+    asset_name: log?.asset?.name,
+    responsible_name: log?.responsible?.name,
+    datetime: new Date(log?.datetime).toLocaleString("pt-BR"),
+    value: Math.round(100 * log?.value, 0) + "%",
+  }));
+  console.log(logs);
 
   const createRandomLog = () => {
-    query(
-      queryAddAssetLog({
+    addAssetLog({
+      variables: {
         type: "Status",
         datetime: Date.now() + 100 * 60 * 60 * 24 * 150 * Math.random(),
         asset: assetId,
@@ -42,16 +51,12 @@ const AssetsLog = ({ visible, setVisible, assetId }) => {
           "622cfa0956402308cff4afe8",
         ][Math.round(Math.random() * 4)],
         value: Math.random(),
-      })
-    ).then(() => getQuery(queryGetAssetsLog, assetId));
+      },
+    });
   };
 
-  const deleteItem = async (_id) => {
-    await query(queryDeleteAssetLog(_id));
-  };
-  
   const onDeleteRow = (_id) => {
-    deleteItem(_id).then(() => getQuery(queryGetAssetsLog, assetId));
+    deleteAssetLog({ variables: { _id } });
   };
 
   const columnsToDisplay = [
@@ -82,12 +87,22 @@ const AssetsLog = ({ visible, setVisible, assetId }) => {
         visible={visible}
         width={window.innerHeight >= 1000 ? 1000 : "100%"}
       >
-        <Button style={{ marginBottom: 20 }} onClick={createRandomLog}>
-          Create random log
-        </Button>
+        {loading | error ? (
+          <LoadingData
+            {...{
+              loading: loading | addAssetLogResponse?.loading | deleteAssetLogResponse?.loading,
+              error,
+            }}
+          />
+        ) : (
+          <>
+            <Button style={{ marginBottom: 20 }} onClick={createRandomLog}>
+              Create random log
+            </Button>
 
-        <CRUDTable data={logs} columnsToDisplay={columnsToDisplay} onDeleteRow={onDeleteRow} />
-        {/* {logs ? logs?.map((log) => <p key={log._id}>{log._id}</p>) : <p>No content</p>} */}
+            <CRUDTable data={logs} columnsToDisplay={columnsToDisplay} onDeleteRow={onDeleteRow} />
+          </>
+        )}
       </Drawer>
     </>
   );

@@ -17,7 +17,11 @@ export default function AssetsListPage() {
   const [modalIsVisible, setModalIsVisible] = useState(false);
   const [dataToEdit, setDataToEdit] = useState();
 
-  if (!data) return <LoadingData {...{ loading: loading | deleteAssetResponse?.loading, error }} />;
+  if (!data)
+    return <LoadingData {...{ loading: loading  | deleteAssetResponse?.loading, error }} />;
+
+    console.log(data)
+  
 
   const items = data?.assets?.map((asset) => ({
     ...asset,
