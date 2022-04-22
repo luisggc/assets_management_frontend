@@ -17,11 +17,9 @@ export default function AssetsListPage() {
   const [modalIsVisible, setModalIsVisible] = useState(false);
   const [dataToEdit, setDataToEdit] = useState();
 
-  if (!data)
-    return <LoadingData {...{ loading: loading  | deleteAssetResponse?.loading, error }} />;
+  if (!data) return <LoadingData {...{ loading: loading | deleteAssetResponse?.loading, error }} />;
 
-    console.log(data)
-  
+  console.log(data);
 
   const items = data?.assets?.map((asset) => ({
     ...asset,
@@ -29,12 +27,12 @@ export default function AssetsListPage() {
     unit_id: asset?.unit?._id,
   }));
 
-  console.log(items)
+  console.log(items);
 
   const deleteItem = async (_id) => {
     deleteAsset({
       variables: { _id },
-      update: cache => {
+      update: (cache) => {
         const data = cache.readQuery({ query: ASSETS });
         cache.writeQuery({
           query: ASSETS,
@@ -71,12 +69,15 @@ export default function AssetsListPage() {
         Add an asset
       </Button>
 
-      <AssetAddEditModal
-        isVisible={modalIsVisible}
-        setModalIsVisible={setModalIsVisible}
-        initialInputData={dataToEdit}
-        handleCancel={handleModalCancel}
-      />
+      {modalIsVisible && (
+        <AssetAddEditModal
+          isVisible={modalIsVisible}
+          setModalIsVisible={setModalIsVisible}
+          initialInputData={dataToEdit}
+          handleCancel={handleModalCancel}
+        />
+      )}
+
       <div>
         {items?.length > 0 ? (
           <div className="cardsAssetContainer">

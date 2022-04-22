@@ -22,10 +22,6 @@ export default function UnitsListPage() {
     company_id: unit?.company?._id,
   }));
 
-  const loadDataTable = () => {
-    refetch();
-  };
-
   const columnsToDisplay = [
     {
       value: "name",
@@ -42,9 +38,9 @@ export default function UnitsListPage() {
     deleteUnit({
       variables: { _id },
       update: (cache, { data: { deleteUnit } }) => {
-        console.log(deleteUnit)
+        console.log(deleteUnit);
         const data = cache.readQuery({ query: UNITS });
-        const unitsUpdated = data.units.filter((_) => _._id !== deleteUnit?._id)
+        const unitsUpdated = data.units.filter((_) => _._id !== deleteUnit?._id);
         cache.writeQuery({
           query: UNITS,
           data: { units: unitsUpdated },
@@ -57,7 +53,6 @@ export default function UnitsListPage() {
     setDataToEdit(itens.filter((d) => d?._id === _id)[0]);
     setModalIsVisible(true);
   };
-
 
   const handleModalCancel = () => {
     setModalIsVisible(false);
@@ -76,12 +71,15 @@ export default function UnitsListPage() {
         Add a unit
       </Button>
 
-      <UnitAddEditModal
-        isVisible={modalIsVisible}
-        setModalIsVisible={setModalIsVisible}
-        initialInputData={dataToEdit}
-        handleCancel={handleModalCancel}
-      />
+      {modalIsVisible && (
+        <UnitAddEditModal
+          isVisible={modalIsVisible}
+          setModalIsVisible={setModalIsVisible}
+          initialInputData={dataToEdit}
+          handleCancel={handleModalCancel}
+        />
+      )}
+
       <div>
         {itens?.length > 0 ? (
           <CRUDTable

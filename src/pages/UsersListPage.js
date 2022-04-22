@@ -1,5 +1,5 @@
 import React from "react";
-import { USERS, DELETE_USER } from "../api/UserQueries"
+import { USERS, DELETE_USER } from "../api/UserQueries";
 import { useState } from "react";
 import { Button } from "antd";
 import CRUDTable from "../components/CRUDTable";
@@ -78,12 +78,15 @@ export default function UsersListPage() {
         Add a user
       </Button>
 
-      <UserAddEditModal
-        isVisible={modalIsVisible}
-        setModalIsVisible={setModalIsVisible}
-        initialInputData={dataToEdit}
-        handleCancel={handleModalCancel}
-      />
+      {modalIsVisible && (
+        <UserAddEditModal
+          isVisible={modalIsVisible}
+          setModalIsVisible={setModalIsVisible}
+          initialInputData={dataToEdit}
+          handleCancel={handleModalCancel}
+        />
+      )}
+
       <div>
         {itens?.length > 0 ? (
           <CRUDTable

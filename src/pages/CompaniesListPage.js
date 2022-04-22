@@ -72,12 +72,15 @@ export default function CompanysListPage() {
         Add a company
       </Button>
 
-      <CompanyAddEditModal
-        isVisible={modalIsVisible}
-        setModalIsVisible={setModalIsVisible}
-        initialInputData={dataToEdit}
-        handleCancel={handleModalCancel}
-      />
+      {modalIsVisible && (
+        <CompanyAddEditModal
+          isVisible={modalIsVisible}
+          setModalIsVisible={setModalIsVisible}
+          initialInputData={dataToEdit}
+          handleCancel={handleModalCancel}
+        />
+      )}
+
       <div>
         {itens?.length > 0 ? (
           <CRUDTable
