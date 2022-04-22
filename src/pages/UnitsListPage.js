@@ -8,13 +8,13 @@ import { useQuery, useMutation } from "@apollo/client";
 import LoadingData from "../components/LoadingData";
 
 export default function UnitsListPage() {
-  const { loading, error, data, refetch } = useQuery(UNITS);
+  const { loading, error, data } = useQuery(UNITS);
   const [deleteUnit, deleteUnitResponse] = useMutation(DELETE_UNIT);
 
   const [modalIsVisible, setModalIsVisible] = useState(false);
   const [dataToEdit, setDataToEdit] = useState();
 
-  if (!data) return <LoadingData {...{ loading, error }} />;
+  if (!data) return <LoadingData {...{ loading: loading | deleteUnitResponse?.loading, error }} />;
 
   const itens = data?.units?.map((unit) => ({
     ...unit,

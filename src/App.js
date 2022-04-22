@@ -1,5 +1,5 @@
 import React from "react";
-import { Layout, Menu, Breadcrumb } from "antd";
+import { Layout, Menu } from "antd";
 import {
   DashboardOutlined,
   BankOutlined,
@@ -26,6 +26,12 @@ const App = () => {
       <Header className="header">
         <div className="logo" />
         <Menu theme="dark" mode="horizontal">
+          <div style={{ display: "flex", alignItems: "center" }}>
+            <div style={{marginRight: 15}}>
+              <img src={process.env.PUBLIC_URL + "/img/header-icon.png"} alt="Logo" />
+            </div>
+            <div>Asset Management Tool</div>
+          </div>
           {/*   <Menu.Item key="1">nav 1</Menu.Item>
           <Menu.Item key="2">nav 2</Menu.Item>
           <Menu.Item key="3">nav 3</Menu.Item> */}
@@ -54,7 +60,7 @@ const App = () => {
             <Menu.Item icon={<IdcardOutlined />} key="/users">
               <Link to="/users">Users</Link>
             </Menu.Item>
-            
+
             {/* 
             <SubMenu key="sub2" icon={<LaptopOutlined />} title="Units">
               <Menu.Item key="6">option5</Menu.Item>
@@ -65,11 +71,11 @@ const App = () => {
           </Menu>
         </Sider>
         <Layout style={{ padding: "0 24px 24px" }}>
-          <Breadcrumb style={{ margin: "16px 0" }}>
+          {/*   <Breadcrumb style={{ margin: "16px 0" }}>
             <Breadcrumb.Item>Home</Breadcrumb.Item>
             <Breadcrumb.Item>List</Breadcrumb.Item>
             <Breadcrumb.Item>App</Breadcrumb.Item>
-          </Breadcrumb>
+          </Breadcrumb> */}
           <Content
             className="site-layout-background"
             style={{

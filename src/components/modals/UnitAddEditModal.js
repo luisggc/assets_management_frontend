@@ -16,12 +16,7 @@ const AddEditModal = (props) => {
     onError: () => openNotification("Unit not edited!", "error"),
   });
   const companiesQuery = useQuery(COMPANIES, { skip: !isVisible });
-  const [loadingCompanies, errorCompanies, dataCompanies] = [
-    companiesQuery.loading,
-    companiesQuery.error,
-    companiesQuery.data,
-  ];
-
+ 
   const loading = isEdit ? editUnitResponse?.loading : addUnitResponse?.loading;
 
   const inputProps = {
@@ -34,7 +29,7 @@ const AddEditModal = (props) => {
       label: "Company",
       name: "company",
       rules: [{ required: true }],
-      initialValue: dataCompanies?.companies,
+      initialValue: companiesQuery?.data?.companies,
     },
   };
 

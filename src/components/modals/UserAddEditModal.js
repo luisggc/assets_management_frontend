@@ -19,7 +19,6 @@ const AddEditModal = (props) => {
   const loading =
     (isEdit ? addUserResponse?.loading : editUserResponse?.loading) | companyResponse?.loading;
 
-  console.log(companyResponse?.data);
   const inputProps = {
     name: {
       label: "Name",

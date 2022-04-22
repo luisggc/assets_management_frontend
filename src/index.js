@@ -2,7 +2,7 @@ import React from "react";
 import ReactDOM from "react-dom";
 import reportWebVitals from "./reportWebVitals";
 import { ConfigProvider } from "antd";
-import ptBR from "antd/lib/locale/pt_BR";
+//import ptBR from "antd/lib/locale/pt_BR";
 import "antd/dist/antd.min.css";
 import "./index.css";
 import App from "./App";
@@ -35,7 +35,7 @@ console.error = (errObj, ...args) => {
 ReactDOM.render(
   <React.StrictMode>
     <BrowserRouter>
-      <ConfigProvider locale={ptBR}>
+      <ConfigProvider> {/*  locale={ptBR}> */}
         <ApolloProvider client={client}>
           <App />
         </ApolloProvider>
